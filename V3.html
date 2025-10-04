@@ -386,7 +386,8 @@ function calc(){
     freeText = I18N[LANG].freeYes(dry.toFixed(2));
     meals = n;
   }else{
-    let n = Math.floor(calories / perMeal);
+    // IMPORTANT FIX: when free‑feeding is NOT allowed, use CEIL for number of meals
+    let n = Math.ceil(calories / perMeal);
     if(n < 1) n = 1;
     meals = n;
     freeText = i.freeNo;
