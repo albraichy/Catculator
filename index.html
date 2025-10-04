@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>حاسبة سعرات القط 🐾 — V5</title>
+<style>
+  :root{--bg:#0b0e14;--card:#111623;--text:#eaf1ff;--muted:#98a2b3;--line:#1f2633;--danger:#ff6b6b;}
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0b0e14 0%,#0e1422 100%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  .hero{padding:40px 18px;border-bottom:1px solid #121826;background: radial-gradient(1200px 1200px at 90% -20%, rgba(106,227,255,.08), transparent 60%)}
+  .container{max-width:980px;margin:0 auto}
+  .title{font-weight:800;font-size:22px;margin-bottom:4px}
+  .subtitle{font-size:12px;color:var(--muted)}
+  .wrap{max-width:980px;margin:0 auto;padding:20px 18px 36px}
+  .card{background:var(--card);padding:18px;border-radius:14px;border:1px solid var(--line);margin-bottom:14px}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  input, select, button{width:100%;padding:12px 10px;border-radius:10px;background:#0e1218;color:var(--text);border:1px solid #1d2432;font-size:15px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .error{font-size:13px;background:rgba(255,107,107,.12);border:1px solid var(--danger);color:#ffc1c1;padding:10px 12px;border-radius:10px;margin-top:8px;display:none}
+  .result{font-size:16px;line-height:1.9}
+  .k{font-weight:700}
+  .hide{display:none !important}
+  button{cursor:pointer;margin-top:14px}
+  button:active{transform:translateY(1px)}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="container">
+    <div class="title">حاسبة سعرات القط — V5</div>
+    <div class="subtitle">تحسينات قوية للزر، التبديل، والأرقام العربية.</div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="card">
+    <label>الوزن الحالي W<sub>current</sub> (كجم)</label>
+    <input id="wcur" type="text" inputmode="decimal" placeholder="مثال: ٤٫٢" value="٤">
+
+    <label style="margin-top:12px">الفئة العمرية/الحالة الأساسية</label>
+    <div class="row">
+      <select id="baseCategory">
+        <option value="kitten_small">صغيرة (٢–٤ أشهر)</option>
+        <option value="kitten_mid">متوسطة (٥–١٢ شهر)</option>
+        <option value="adult" selected>بالغة (سنة <)</option>
+        <option value="spayed">معقمة</option>
+      </select>
+
+      <div id="baseNumberWrap" class="hide">
+        <input id="baseNumber" type="text" inputmode="numeric" placeholder="اكتب الأسابيع/الأشهر حسب الاختيار">
+      </div>
+
+      <div id="adultActivityWrap">
+        <select id="adultActivity">
+          <option value="low">قليل</option>
+          <option value="med" selected>متوسط</option>
+          <option value="high">عالي</option>
+        </select>
+      </div>
+    </div>
+    <div id="baseError" class="error"></div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+      <label style="display:flex;align-items:center;gap:8px"><input id="isPreg" type="checkbox" style="width:auto"> حامل</label>
+      <label style="display:flex;align-items:center;gap:8px"><input id="isLac" type="checkbox" style="width:auto"> مرضعة</label>
+    </div>
+
+    <div id="pregBlock" class="row hide" style="margin-top:6px">
+      <div>
+        <label>الوزن قبل الحمل (كجم)</label>
+        <input id="prePregW" type="text" inputmode="decimal" placeholder="مثال: ٣٫٨">
+      </div>
+      <div>
+        <label>أسبوع الحمل</label>
+        <select id="pregWeek">
+          <option value="1-4">الأسبوع ١–٤</option>
+          <option value="5">الأسبوع ٥</option>
+          <option value="6">الأسبوع ٦</option>
+          <option value="7">الأسبوع ٧</option>
+          <option value="8">الأسبوع ٨</option>
+          <option value="9">الأسبوع ٩</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="lacBlock" class="row hide" style="margin-top:6px">
+      <div>
+        <label>عدد القطط</label>
+        <select id="litter">
+          <option value="le2">= أو ≤ ٢</option>
+          <option value="3-4">٣–٤</option>
+          <option value="5-6">٥–٦</option>
+          <option value="ge7">≥ أو = ٧</option>
+        </select>
+      </div>
+      <div>
+        <label>أسابيع الإرضاع</label>
+        <select id="lacWeek"></select>
+      </div>
+    </div>
+
+    <div id="globalError" class="error"></div>
+    <button id="calcBtn">احسب النتائج</button>
+  </div>
+
+  <div class="card">
+    <div class="result" id="resultBox">
+      <div><span class="k">السعرات اليومية:</span> 0 kcal</div>
+      <div><span class="k">عدد الوجبات:</span> 0</div>
+      <div><span class="k">الأكل الحر:</span> —</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 1) أرقام عربية إلى لاتينية
+function normalizeNumber(s){
+  if(s==null) return '';
+  const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.',',':'.',' ':'','\u200f':''};
+  return s.toString().split('').map(ch=>map[ch] ?? ch).join('');
+}
+
+// 2) جهّز قوائم الأسابيع
+(function(){
+  const lacWeek = document.getElementById('lacWeek');
+  for(let i=1;i<=10;i++){ const o=document.createElement('option'); o.value=String(i); o.textContent='الأسبوع '+i; lacWeek.appendChild(o); }
+})();
+
+// 3) خرائط افتراضية (غيّرها لاحقاً حسب الجداول)
+const MAP = {
+  kitten_small_weeks: (w)=>1.00,
+  kitten_mid_months: (m)=>1.00,
+  adult_activity: { low:1.00, med:1.00, high:1.00 },
+  spayed_activity:{ low:1.00, med:1.00, high:1.00 },
+  pregnancyP: { '1-4':1.00, '5':1.00, '6':1.00, '7':1.00, '8':1.00, '9':1.00 },
+  lactationBaseP: { 'le2':1.00, '3-4':1.00, '5-6':1.00, 'ge7':1.00 },
+  lactationWeekFactor: (wk)=>1.00,
+  allowFreeFood: function(){ return false; },
+  dryKcalPerGram: 4
+};
+
+// 4) عناصر
+const E = (id)=>document.getElementById(id);
+const els = {
+  W: E('wcur'),
+  baseCat: E('baseCategory'),
+  baseNum: E('baseNumber'),
+  baseNumWrap: E('baseNumberWrap'),
+  adultAct: E('adultActivity'),
+  adultActWrap: E('adultActivityWrap'),
+  baseErr: E('baseError'),
+  isPreg: E('isPreg'),
+  pregBlock: E('pregBlock'),
+  prePregW: E('prePregW'),
+  pregWeek: E('pregWeek'),
+  isLac: E('isLac'),
+  lacBlock: E('lacBlock'),
+  litter: E('litter'),
+  lacWeek: E('lacWeek'),
+  globalError: E('globalError'),
+  result: E('resultBox'),
+  btn: E('calcBtn')
+};
+
+// 5) تبديل الحقول
+function toggleBlocks(){
+  const cat = els.baseCat.value;
+  const adultMode = (cat==='adult' || cat==='spayed');
+  els.baseNumWrap.classList.toggle('hide', adultMode);
+  els.adultActWrap.classList.toggle('hide', !adultMode);
+  els.pregBlock.classList.toggle('hide', !els.isPreg.checked);
+  els.lacBlock.classList.toggle('hide', !els.isLac.checked);
+  if(adultMode){ els.baseNum.value=''; els.baseErr.style.display='none'; }
+}
+
+// 6) تحقق المدخلات الخاصة بالعمر
+function validateBase(){
+  const cat = els.baseCat.value;
+  let ok = true, msg='';
+  if(cat==='kitten_small'){
+    const wk = parseInt(normalizeNumber(els.baseNum.value));
+    if(isNaN(wk)){ ok=false; msg='أدخل رقم الأسابيع.'; }
+    else if(wk<5 || wk>16){ ok=false; msg='رقم الأسبوع غير مناسب (المسموح ٥–١٦).'; }
+  } else if(cat==='kitten_mid'){
+    const mo = parseInt(normalizeNumber(els.baseNum.value));
+    if(isNaN(mo)){ ok=false; msg='أدخل رقم الأشهر.'; }
+    else if(mo<5 || mo>12){ ok=false; msg='رقم الشهر غير مناسب (المسموح ٥–١٢).'; }
+  }
+  els.baseErr.textContent = msg;
+  els.baseErr.style.display = ok ? 'none' : 'block';
+  return ok;
+}
+
+// 7) حسبة واحدة عند الضغط
+function computeOnce(){
+  els.globalError.style.display='none';
+  toggleBlocks();
+
+  const W = parseFloat(normalizeNumber(els.W.value));
+  if(!(W>0)){
+    els.globalError.textContent='أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).';
+    els.globalError.style.display='block';
+    render(0,0,false,0);
+    return;
+  }
+
+  const cat = els.baseCat.value;
+  const baseOK = validateBase();
+  if(!baseOK && (cat==='kitten_small' || cat==='kitten_mid')){
+    els.globalError.textContent='تحقّق من رقم الأسابيع/الأشهر — خارج النطاق.';
+    els.globalError.style.display='block';
+    render(0,0,false,0);
+    return;
+  }
+
+  // اشتقاق المعاملات
+  let A=1.0,P=1.0,L=1.0,Wprior=null;
+  let weeks=null, months=null;
+  if(cat==='kitten_small'){ weeks = parseInt(normalizeNumber(els.baseNum.value)); A = MAP.kitten_small_weeks(weeks); }
+  else if(cat==='kitten_mid'){ months = parseInt(normalizeNumber(els.baseNum.value)); A = MAP.kitten_mid_months(months); }
+  else if(cat==='adult'){ L = MAP.adult_activity[els.adultAct.value] ?? 1.0; }
+  else if(cat==='spayed'){ L = MAP.spayed_activity[els.adultAct.value] ?? 1.0; }
+
+  const isPreg = !!els.isPreg.checked;
+  if(isPreg){
+    P *= (MAP.pregnancyP[els.pregWeek.value] ?? 1.0);
+    const pre = parseFloat(normalizeNumber(els.prePregW.value));
+    if(pre>0) Wprior = pre;
+  }
+  const isLac = !!els.isLac.checked;
+  if(isLac){
+    P *= (MAP.lactationBaseP[els.litter.value] ?? 1.0) * MAP.lactationWeekFactor(parseInt(els.lacWeek.value||'1'));
+  }
+
+  const denom = (Wprior && Wprior>0) ? Math.pow(W/Wprior,0.67) : 1;
+  const C = 100 * Math.pow(W,0.67) * A * (P/denom) * L;
+
+  const N_noFree = Math.ceil(C/(40*W));
+  let useFree=false, freeGrams=0, N=N_noFree;
+
+  const allow = MAP.allowFreeFood({cat,weeks,months,adultActivity:els.adultAct.value,isPreg,pregWeek:els.pregWeek.value,isLac,litter:els.litter.value,lacWeek:parseInt(els.lacWeek.value||'1')});
+  if(allow && N_noFree>=2){
+    const N3 = Math.max(1, N_noFree-1);
+    const dC = C - N3*(40*W);
+    const kcalPerGram = MAP.dryKcalPerGram;
+    freeGrams = (dC>0 && kcalPerGram>0)? dC/kcalPerGram : 0;
+    if(dC>0){ useFree=true; N=N3; }
+  }
+
+  render(C,N,useFree,freeGrams);
+}
+
+// 8) عرض النتائج
+function render(C,N,useFree,freeGrams){
+  const fmt = (x)=> (x? Number(x).toLocaleString('ar-EG',{maximumFractionDigits:2}) : '0');
+  els.result.innerHTML =
+    '<div><span class="k">السعرات اليومية:</span> '+fmt(C)+' kcal</div>'+
+    '<div><span class="k">عدد الوجبات:</span> '+(N||0)+'</div>'+
+    (useFree
+      ? '<div><span class="k">الأكل الحر:</span> مع أكل حر — المطلوب تقريباً '+fmt(freeGrams)+' غ</div>'
+      : '<div><span class="k">الأكل الحر:</span> بدون أكل حر</div>');
+}
+
+// 9) ربط الأحداث بقوة (onchange + onclick + addEventListener)
+['change','input','click'].forEach(ev=>{
+  els.baseCat.addEventListener(ev, toggleBlocks);
+  els.isPreg.addEventListener(ev, toggleBlocks);
+  els.isLac.addEventListener(ev, toggleBlocks);
+});
+els.btn.addEventListener('click', computeOnce);
+// كمان setAttribute عشان بعض المتصفحات القديمة
+els.btn.setAttribute('onclick','computeOnce()');
+
+// init
+toggleBlocks();
+</script>
+</body>
+</html>
