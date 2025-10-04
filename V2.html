@@ -1,400 +1,559 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cat Calorie Calculator — V18</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>حاسبة سعرات القط</title>
 <style>
 :root{
-  --bg:#0b1220; --bg2:#0a0f1a; --card:#0f1628; --line:#1c2742;
-  --text:#eaf1ff; --muted:#9fb0c7; --accent:#4cc9f0; --accent2:#b5179e;
-  --danger:#ff6b6b; --ok:#2dd4bf; --radius:16px;
+  --bg:#0b1620;--card:#111d2a;--muted:#7a8aa0;--txt:#e9f1ff;
+  --accent1:#a855f7;--accent2:#22d3ee;--good:#22c55e;--bad:#ef4444;
+  --ring: 0 0 0 2px rgba(34,211,238,.35), 0 0 0 8px rgba(168,85,247,.15);
+  --radius:14px
 }
-*{box-sizing:border-box} html,body{height:100%}
-body{
-  margin:0; color:var(--text);
-  background:
-    radial-gradient(1200px 900px at 10% -10%, rgba(76,201,240,.08), transparent 60%),
-    radial-gradient(900px 600px at 110% -10%, rgba(181,23,158,.06), transparent 50%),
-    linear-gradient(180deg,var(--bg) 0%, var(--bg2) 100%);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Noto Naskh Arabic", "Noto Kufi Arabic", sans-serif;
-}
-header{position:sticky;top:0;z-index:5;backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--line);
-  background:linear-gradient(180deg, rgba(11,18,32,.9), rgba(11,18,32,.6));}
-.nav{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
-.brand{display:flex;align-items:center;gap:10px}
-.logo{width:34px;height:34px;border-radius:10px;background: radial-gradient(16px 16px at 70% 30%, var(--accent), transparent), linear-gradient(135deg,var(--accent2), var(--accent)); box-shadow:0 6px 18px rgba(76,201,240,.35), inset 0 0 24px rgba(255,255,255,.08)}
-.title{font-weight:800;margin:0;font-size:18px;letter-spacing:.3px}
-.lang{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden}
-.lang button{background:transparent;color:#bcd0ef;border:none;padding:8px 14px;cursor:pointer;font-weight:800;min-width:52px}
-.lang button.active{color:white;background:linear-gradient(135deg,var(--accent2),var(--accent))}
-main{max-width:1100px;margin:24px auto;padding:0 16px 40px}
-.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
-@media(max-width:940px){.grid{grid-template-columns:1fr}}
-.card{background:linear-gradient(180deg, rgba(255,255,255,.02), transparent 30%), var(--card);
-  border:1px solid var(--line); border-radius:var(--radius); padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.section-title{font-weight:900;margin:2px 0 14px 0;font-size:20px}
-label{display:block;font-size:12.5px;color:#9fb0c7;margin:6px 0 8px 0}
-input,select{width:100%;padding:13px 12px;border-radius:12px;background:#0b1324;color:var(--text);
-  border:1px solid #22304f;font-size:15px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-input::placeholder{color:#6f7c95}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.toggles{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
-.toggle{display:flex;align-items:center;gap:8px}
-.toggle input{width:auto}
-.error{font-size:13px;background:rgba(255,107,107,.12);border:1px solid var(--danger);color:#ffd1d1;padding:10px 12px;border-radius:12px;margin:10px 0;display:none}
-.cta{margin-top:12px;display:flex;gap:12px;flex-wrap:wrap}
-button{cursor:pointer;border-radius:12px;padding:12px 18px;font-weight:900;letter-spacing:.2px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:white}
-button.secondary{background:#0b1324;color:var(--text);border:1px solid #22304f}
-.stat{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px dashed #2a385c;border-radius:12px;margin:8px 0;background:#0b1324}
-.stat .k{font-weight:800}
-.hide{display:none !important}
-footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0c7;text-align:center;font-size:13px}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(1200px 700px at 80% -10%,rgba(34,211,238,.07),transparent 60%),radial-gradient(900px 500px at -20% -10%,rgba(168,85,247,.08),transparent 55%),var(--bg);color:var(--txt);font-family:system-ui,Segoe UI,Roboto,Apple Color Emoji}
+.container{max-width:900px;margin:0 auto;padding:24px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 18px}
+h1{font-weight:800;letter-spacing:.4px;margin:0;font-size:clamp(22px,4vw,30px)}
+.lang{display:flex;gap:8px;align-items:center}
+.toggle{position:relative;background:linear-gradient(120deg,var(--accent1),var(--accent2));padding:3px;border-radius:999px}
+.toggle button{border:0;background:transparent;color:#fff;opacity:.6;padding:8px 16px;border-radius:999px;font-weight:700}
+.toggle button.active{background:rgba(255,255,255,.12);opacity:1;box-shadow:inset var(--ring)}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:18px;backdrop-filter:blur(6px);box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.section-title{font-weight:800;margin:10px 0 14px;font-size:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row{display:flex;gap:14px}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.row{flex-direction:column}}
+label{font-size:14px;color:var(--muted);display:block;margin:4px 2px 6px}
+.input,select{width:100%;background:rgba(255,255,255,.06);color:var(--txt);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 12px;font-size:16px;outline:none}
+select{appearance:none;direction:rtl}
+.input:focus,select:focus{box-shadow:var(--ring);border-color:transparent}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.hidden{display:none !important}
+.bad{color:#fff;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.45);padding:12px;border-radius:12px}
+.btnrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.btn{border:0;border-radius:999px;padding:12px 18px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--accent1),var(--accent2));box-shadow:0 8px 18px rgba(34,211,238,.25)}
+.btn.secondary{background:rgba(255,255,255,.08);box-shadow:none;color:#dbeafe}
+.results .item{display:flex;justify-content:space-between;gap:10px;padding:12px;border:1px dashed rgba(255,255,255,.15);border-radius:12px;margin-top:8px}
+.footer{opacity:.65;text-align:center;margin:22px 0 6px;font-size:13px}
+.smallcaps{font-variant:all-small-caps;opacity:.8}
 </style>
 </head>
 <body>
-<header>
-  <div class="nav">
-    <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <h1 class="title" id="appTitle">حاسبة سعرات القط</h1>
-    </div>
-    <div class="lang" role="tablist" aria-label="Language">
-      <button id="btnAR" class="active" aria-selected="true">ع</button>
-      <button id="btnEN" aria-selected="false">E</button>
+<div class="container">
+  <div class="header">
+    <h1 id="title">حاسبة سعرات القط</h1>
+    <div class="toggle" role="group" aria-label="language">
+      <button id="lang-ar" class="active" onclick="setLang('ar')">ع</button>
+      <button id="lang-en" onclick="setLang('en')">E</button>
     </div>
   </div>
-</header>
 
-<main>
-  <section class="card" id="gateCard">
-    <h2 class="section-title" id="secGateTitle">اختر الجنس للمتابعة</h2>
-    <label id="lblSexGate">جنس القطة</label>
-    <select id="sex"></select>
-  </section>
-
-  <div class="grid hide" id="calcGrid">
-    <section class="card">
-      <h2 class="section-title" id="secInputs">المدخلات</h2>
-
-      <label id="lblW">الوزن الحالي (كجم)</label>
-      <input id="wcur" type="text" inputmode="decimal" placeholder="مثال: ٠٫٩">
-
-      <label id="lblBase" style="margin-top:12px">الفئة العمرية/الحالة الأساسية</label>
-      <div class="row">
-        <select id="baseCategory"></select>
-        <div id="baseNumberWrap"><select id="baseNumber"></select></div>
-        <div id="adultActivityWrap" class="hide"><select id="adultActivity"></select></div>
+  <div class="card">
+    <div class="section-title" id="sec-gender">اختر الجنس للمتابعة</div>
+    <div class="grid">
+      <div>
+        <label id="lab-gender">جنس القطة</label>
+        <select id="gender">
+          <option value="" selected disabled>—</option>
+          <option value="male">ذكر</option>
+          <option value="female">أنثى</option>
+        </select>
       </div>
-
-      <div id="reproToggles" class="toggles hide">
-        <label class="toggle"><input id="isPreg" type="checkbox"> <span id="txtPreg">حامل</span></label>
-        <label class="toggle"><input id="isLac" type="checkbox"> <span id="txtLac">مرضعة</span></label>
-      </div>
-
-      <div id="pregBlock" class="row hide" style="margin-top:6px">
-        <div>
-          <label id="lblPreW">الوزن قبل الحمل (كجم)</label>
-          <input id="prePregW" type="text" inputmode="decimal" placeholder="مثال: ٣٫٨">
-        </div>
-        <div>
-          <label id="lblPregWeek">أسبوع الحمل</label>
-          <select id="pregWeek"></select>
-        </div>
-      </div>
-
-      <div id="lacBlock" class="row hide" style="margin-top:6px">
-        <div>
-          <label id="lblLitter">عدد الصغار</label>
-          <select id="litter"></select>
-        </div>
-        <div>
-          <label id="lblLacWeek">أسبوع الإرضاع</label>
-          <select id="lacWeek"></select>
-        </div>
-      </div>
-
-      <div class="error" id="errorAll"></div>
-      <div class="cta">
-        <button id="calcBtn">احسب النتائج</button>
-        <button class="secondary" id="resetBtn">إعادة ضبط</button>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title" id="secResults">النتائج</h2>
-      <div class="stat"><div class="k" id="r1k">السعرات اليومية</div><div id="r1v">0 kcal</div></div>
-      <div class="stat"><div class="k" id="r2k">عدد الوجبات</div><div id="r2v">0</div></div>
-      <div class="stat"><div class="k" id="r3k">الأكل الحر</div><div id="r3v">—</div></div>
-    </section>
+    </div>
   </div>
 
-  <footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
-</main>
+  <div id="inputsCard" class="card hidden">
+    <div class="section-title" id="sec-inputs">المدخلات</div>
+
+    <div class="grid">
+      <div>
+        <label id="lab-weight">الوزن الحالي (كجم)</label>
+        <input id="wCurrent" class="input" inputmode="decimal" placeholder="مثال: ٠٫٩">
+      </div>
+
+      <div>
+        <label id="lab-cat">الفئة العمرية/الحالة الأساسية</label>
+        <select id="ageCat">
+          <option value="" selected disabled>—</option>
+          <option value="kitten">صغيرة (٢–٤ أشهر)</option>
+          <option value="junior">متوسطة (٥–١٢ شهر)</option>
+          <option value="adult">بالغة (أكبر من سنة)</option>
+          <option value="neutered">معقمة</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="row-week-month" class="grid hidden">
+      <div>
+        <label id="lab-week">الأسبوع</label>
+        <select id="weekSel">
+          <!-- weeks 5..16 -->
+        </select>
+      </div>
+      <div>
+        <label id="lab-month">الشهر</label>
+        <select id="monthSel">
+          <!-- months 5..12 -->
+        </select>
+      </div>
+    </div>
+
+    <div id="row-activity" class="grid hidden">
+      <div>
+        <label id="lab-activity">النشاط</label>
+        <select id="activity">
+          <option value="low">قليل</option>
+          <option value="med">متوسط</option>
+          <option value="high">عالي</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="reproRow" class="grid hidden">
+      <div>
+        <label id="lab-preg">حامل</label>
+        <input id="pregnant" type="checkbox" class="input" style="height:48px; width:48px; accent-color:#a855f7;">
+      </div>
+      <div>
+        <label id="lab-lact">مرضعة</label>
+        <input id="lactating" type="checkbox" class="input" style="height:48px; width:48px; accent-color:#22d3ee;">
+      </div>
+    </div>
+
+    <div id="pregRow" class="grid hidden">
+      <div>
+        <label id="lab-wprior">الوزن قبل الحمل (كجم)</label>
+        <input id="wPrior" class="input" inputmode="decimal" placeholder="مثال: ٣٫٨">
+      </div>
+      <div>
+        <label id="lab-pweek">أسبوع الحمل</label>
+        <select id="pregWeek">
+          <option value="1-4">١–٤</option>
+          <option value="5">٥</option>
+          <option value="6">٦</option>
+          <option value="7">٧</option>
+          <option value="8">٨</option>
+          <option value="9">٩</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="lactRow" class="grid hidden">
+      <div>
+        <label id="lab-kcount">عدد الصغار</label>
+        <select id="kittenCount">
+          <option value="le2">≤٢</option>
+          <option value="3-4">٣–٤</option>
+          <option value="5-6">٥–٦</option>
+          <option value="ge7">٧≤</option>
+        </select>
+      </div>
+      <div>
+        <label id="lab-lweek">أسـبوع الإرضاع</label>
+        <select id="lactWeek">
+          <option value="1">الأسبوع ١</option>
+          <option value="2">الأسبوع ٢</option>
+          <option value="3">الأسبوع ٣</option>
+          <option value="4">الأسبوع ٤</option>
+          <option value="5">الأسبوع ٥</option>
+          <option value="6">الأسبوع ٦</option>
+          <option value="7">الأسبوع ٧</option>
+          <option value="8">الأسبوع ٨</option>
+          <option value="9">الأسبوع ٩</option>
+          <option value="10">الأسبوع ١٠</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="err" class="bad hidden"></div>
+
+    <div class="btnrow">
+      <button id="calcBtn" class="btn">احسب النتائج</button>
+      <button id="resetBtn" class="btn secondary">إعادة ضبط</button>
+    </div>
+  </div>
+
+  <div id="resultsCard" class="card hidden results">
+    <div class="section-title" id="sec-results">النتائج</div>
+    <div class="item"><span id="lab-cal">السعرات اليومية</span><span id="out-cal">0 kcal</span></div>
+    <div class="item"><span id="lab-meals">عدد الوجبات</span><span id="out-meals">0</span></div>
+    <div class="item"><span id="lab-free">الأكل الحر</span><span id="out-free">—</span></div>
+  </div>
+
+  <div class="footer smallcaps" id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</div>
+</div>
 
 <script>
-/* ---------- I18N ---------- */
-const I18N = {
+const i18n = {
   ar:{
-    dir:"rtl", appTitle:"حاسبة سعرات القط", gateTitle:"اختر الجنس للمتابعة", sex:"جنس القطة",
-    sexOptions:[["","— اختر —"],["male","ذكر"],["female","أنثى"]],
-    inputs:"المدخلات", results:"النتائج",
-    w:"الوزن الحالي (كجم)", wPh:"مثال: ٠٫٩", base:"الفئة العمرية/الحالة الأساسية",
-    small_f:"صغيرة (٢–٤ أشهر)", mid_f:"متوسطة (٥–١٢ شهر)", adult_f:"بالغة (أكبر من سنة)", spayed_f:"معقمة",
-    small_m:"صغير (٢–٤ أشهر)",  mid_m:"متوسط (٥–١٢ شهر)",   adult_m:"بالغ (أكبر من سنة)",  spayed_m:"معقم",
-    low:"نشاط قليل", med:"نشاط متوسط", high:"نشاط عالي",
-    preg:"حامل", lact:"مرضعة",
-    preW:"الوزن قبل الحمل (كجم)", preWph:"مثال: ٣٫٨",
-    pregWeek:"أسبوع الحمل", litter:"عدد الصغار", lacWeek:"أسبوع الإرضاع",
-    calc:"احسب النتائج", reset:"إعادة ضبط",
-    daily:"السعرات اليومية", meals:"عدد الوجبات", free:"الأكل الحر",
-    freeYes:(g)=>`مع أكل حر — المطلوب تقريباً ${g} غ`, freeNo:"بدون أكل حر",
-    errW:"أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).",
-    errWeeks:"الأسابيع يجب أن تكون بين ٥ و ١٦.", errMonths:"الأشهر يجب أن تكون بين ٥ و ١٢.",
-    errPreW:"الوزن قبل الحمل مطلوب عند اختيار (حامل).",
-    copyright:"© Albraichy 2025 — جميع الحقوق محفوظة",
-    week:(n)=>`الأسبوع ${n}`, month:(n)=>`الشهر ${n}`,
-    kittenCounts:[["le2","≤٢"],["3-4","٣–٤"],["5-6","٥–٦"],["ge7","≥٧"]],
-    pregWeeks:[["1-4","١–٤"],["5","٥"],["6","٦"],["7","٧"],["8","٨"],["9","٩"]],
+    title:"حاسبة سعرات القط", secGender:"اختر الجنس للمتابعة", labGender:"جنس القطة",
+    secInputs:"المدخلات", labWeight:"الوزن الحالي (كجم)", labCat:"الفئة العمرية/الحالة الأساسية",
+    kitten:"صغيرة (٢–٤ أشهر)", junior:"متوسطة (٥–١٢ شهر)", adult_f:"بالغة (أكبر من سنة)", adult_m:"بالغ (أكبر من سنة)",
+    neutered_f:"معقمة", neutered_m:"معقم",
+    labWeek:"الأسبوع", labMonth:"الشهر", labActivity:"النشاط",
+    low:"قليل", med:"متوسط", high:"عالي",
+    labPreg:"حامل", labLact:"مرضعة", labWprior:"الوزن قبل الحمل (كجم)",
+    labPweek:"أسبوع الحمل", labKcount:"عدد الصغار", labLweek:"أسـبوع الإرضاع",
+    errWeight:"أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).",
+    errWprior:"الوزن قبل الحمل مطلوب عند اختيار (حامل).",
+    btnCalc:"احسب النتائج", btnReset:"إعادة ضبط",
+    secResults:"النتائج", dailyCal:"السعرات اليومية", meals:"عدد الوجبات",
+    freeLabel:"الأكل الحر", freeYes:(g)=>`مع أكل حر — المطلوب تقريبًا ${g.toFixed(2)} غ`, freeNo:"بدون أكل حر",
+    copyright:"© Albraichy 2025 — جميع الحقوق محفوظة"
   },
   en:{
-    dir:"ltr", appTitle:"Cat Calorie Calculator", gateTitle:"Choose sex to continue", sex:"Cat’s Sex",
-    sexOptions:[["","— Select —"],["male","Male"],["female","Female"]],
-    inputs:"Inputs", results:"Results",
-    w:"Current Weight (kg)", wPh:"e.g., 0.9", base:"Age / Base Condition",
-    small_f:"Kitten (2–4 mo)", mid_f:"Kitten (5–12 mo)", adult_f:"Adult (>1 yr)", spayed_f:"Spayed",
-    small_m:"Kitten (2–4 mo)", mid_m:"Kitten (5–12 mo)", adult_m:"Adult (>1 yr)", spayed_m:"Neutered",
-    low:"Low Activity", med:"Moderate Activity", high:"High Activity",
-    preg:"Pregnant", lact:"Lactating",
-    preW:"Pre‑pregnancy Weight (kg)", preWph:"e.g., 3.8",
-    pregWeek:"Pregnancy Week", litter:"Kitten Count", lacWeek:"Lactation Week",
-    calc:"Calculate", reset:"Reset",
-    daily:"Daily Calories", meals:"Meals per Day", free:"Free‑feeding",
-    freeYes:(g)=>`Allowed — dry food ≈ ${g} g`, freeNo:"Not allowed",
-    errW:"Enter a valid weight (> 0).",
-    errWeeks:"Weeks must be between 5 and 16.", errMonths:"Months must be between 5 and 12.",
-    errPreW:"Pre‑pregnancy weight is required when 'Pregnant' is selected.",
-    copyright:"© Albraichy 2025 — All rights reserved",
-    week:(n)=>`Week ${n}`, month:(n)=>`Month ${n}`,
-    kittenCounts:[["le2","≤2"],["3-4","3–4"],["5-6","5–6"],["ge7","≥7"]],
-    pregWeeks:[["1-4","1–4"],["5","5"],["6","6"],["7","7"],["8","8"],["9","9"]],
+    title:"Cat Calorie Calculator", secGender:"Select Sex to continue", labGender:"Sex",
+    secInputs:"Inputs", labWeight:"Current Weight (kg)", labCat:"Age / Base Condition",
+    kitten:"Kitten (2–4 mo)", junior:"Junior (5–12 mo)", adult_f:"Adult (>1 yr)", adult_m:"Adult (>1 yr)",
+    neutered_f:"Spayed", neutered_m:"Neutered",
+    labWeek:"Week", labMonth:"Month", labActivity:"Activity",
+    low:"Low", med:"Moderate", high:"High",
+    labPreg:"Pregnant", labLact:"Lactating", labWprior:"Pre-pregnancy Weight (kg)",
+    labPweek:"Pregnancy Week", labKcount:"Kitten Count", labLweek:"Lactation Week",
+    errWeight:"Enter a valid current weight (>0).",
+    errWprior:"Pre-pregnancy weight is required when 'Pregnant' is selected.",
+    btnCalc:"Calculate", btnReset:"Reset",
+    secResults:"Results", dailyCal:"Daily Calories", meals:"Meals per Day",
+    freeLabel:"Free-feeding", freeYes:(g)=>`with free‑feeding — approx ${g.toFixed(2)} g`, freeNo:"No free‑feeding",
+    copyright:"© Albraichy 2025 — All rights reserved"
   }
 };
-let LANG='ar';
-const $ = (id)=>document.getElementById(id);
-function setSelectOptions(sel, arr, keepValue=null){
-  const val = keepValue ?? sel.value;
-  sel.innerHTML='';
-  arr.forEach(([v,txt])=>{const o=document.createElement('option');o.value=v;o.textContent=txt;sel.appendChild(o);});
-  if(val && [...sel.options].some(o=>o.value===val)) sel.value = val;
-}
-function toASCII(s){
-  if(!s) return '';
-  const map={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.',',':'.',' ':'','\u200f':''};
-  return s.toString().split('').map(c => (c in map)?map[c]:c).join('');
-}
 
-/* ---------- tables ---------- */
-const A_small={5:2.50,6:2.45,7:2.40,8:2.35,9:2.30,10:2.25,11:2.20,12:2.15,13:2.10,14:2.10,15:2.00,16:2.00};
-const A_mid={5:1.95,6:1.90,7:1.85,8:1.80,9:1.75,10:1.50,11:1.50,12:1.50};
-const A_adult={low:0.90,med:1.00,high:1.10};
-const A_spayed={low:0.75,med:0.85,high:0.95};
-const P_preg={'1-4':1.00,'5':1.10,'6':1.20,'7':1.30,'8':1.40,'9':1.45};
-const L_lac={
-  1:{'le2':1.6,'3-4':1.8,'5-6':2.0,'ge7':2.2},
-  2:{'le2':1.8,'3-4':2.2,'5-6':2.5,'ge7':2.7},
-  3:{'le2':2.0,'3-4':2.5,'5-6':2.8,'ge7':3.0},
-  4:{'le2':2.0,'3-4':2.5,'5-6':3.0,'ge7':3.0},
-  5:{'le2':1.8,'3-4':2.3,'5-6':2.6,'ge7':2.7},
-  6:{'le2':1.6,'3-4':2.1,'5-6':2.3,'ge7':2.4},
-  7:{'le2':1.3,'3-4':1.7,'5-6':1.9,'ge7':2.0},
-  8:{'le2':1.2,'3-4':1.4,'5-6':1.5,'ge7':1.6},
-  9:{'le2':1.05,'3-4':1.2,'5-6':1.25,'ge7':1.3},
-  10:{'le2':1.0,'3-4':1.0,'5-6':1.0,'ge7':1.0}
+// Multipliers (A) and free-food flags per your tables
+const A_SMALL = {5:{a:2.50,free:true},6:{a:2.45,free:true},7:{a:2.40,free:true},8:{a:2.35,free:true},9:{a:2.30,free:true},10:{a:2.25,free:true},11:{a:2.20,free:true},12:{a:2.15,free:true},13:{a:2.10,free:true},14:{a:2.10,free:true},15:{a:2.00,free:false},16:{a:2.00,free:false}};
+const A_JUNIOR = {5:{a:1.95,free:false},6:{a:1.90,free:false},7:{a:1.85,free:false},8:{a:1.80,free:false},9:{a:1.75,free:false},10:{a:1.50,free:false},11:{a:1.50,free:false},12:{a:1.50,free:false}};
+const A_ADULT = {low:{a:0.90,free:false},med:{a:1.00,free:false},high:{a:1.10,free:true}};
+const A_NEUTERED = {low:{a:0.75,free:false},med:{a:0.85,free:false},high:{a:0.95,free:true}};
+
+// Pregnancy multipliers (P)
+const P_TABLE = {"1-4":{p:1.00,free:false},"5":{p:1.10,free:false},"6":{p:1.20,free:true},"7":{p:1.30,free:true},"8":{p:1.40,free:true},"9":{p:1.45,free:true}};
+
+// Lactation multipliers (L): columns order ≤2, 3–4, 5–6, 7≤
+const L_TABLE = {
+  "le2": { // ≤2
+    "1":{l:1.0, free:true},"2":{l:1.6, free:true},"3":{l:1.8, free:true},"4":{l:2.0, free:true},
+    "5":{l:2.0, free:true},"6":{l:1.6, free:true},"7":{l:1.3, free:true},"8":{l:1.0, free:true},
+    "9":{l:1.0, free:false},"10":{l:1.0, free:false}
+  },
+  "3-4":{
+    "1":{l:1.0, free:true},"2":{l:1.8, free:true},"3":{l:2.0, free:true},"4":{l:2.5, free:true},
+    "5":{l:2.6, free:true},"6":{l:2.3, free:true},"7":{l:1.9, free:true},"8":{l:1.5, free:true},
+    "9":{l:1.25, free:false},"10":{l:1.0, free:false}
+  },
+  "5-6":{
+    "1":{l:1.0, free:true},"2":{l:2.0, free:true},"3":{l:2.5, free:true},"4":{l:2.8, free:true},
+    "5":{l:2.6, free:true},"6":{l:2.3, free:true},"7":{l:1.7, free:true},"8":{l:1.4, free:true},
+    "9":{l:1.2, free:false},"10":{l:1.0, free:false}
+  },
+  "ge7":{
+    "1":{l:1.0, free:true},"2":{l:2.2, free:true},"3":{l:2.7, free:true},"4":{l:3.0, free:true},
+    "5":{l:3.0, free:true},"6":{l:2.7, free:true},"7":{l:2.4, free:true},"8":{l:2.0, free:true},
+    "9":{l:1.6, free:false},"10":{l:1.0, free:false}
+  }
 };
 
-/* ---------- refs ---------- */
-const appTitle=$('appTitle'), secGateTitle=$('secGateTitle'), lblSexGate=$('lblSexGate');
-const gateCard=$('gateCard'), calcGrid=$('calcGrid'), sex=$('sex');
-const secInputs=$('secInputs'), secResults=$('secResults');
-const lblW=$('lblW'), wcur=$('wcur'), lblBase=$('lblBase');
-const baseCategory=$('baseCategory'), baseNumber=$('baseNumber'), baseNumberWrap=$('baseNumberWrap');
-const adultActivity=$('adultActivity'), adultActivityWrap=$('adultActivityWrap');
-const reproToggles=$('reproToggles'), isPreg=$('isPreg'), isLac=$('isLac'), txtPreg=$('txtPreg'), txtLac=$('txtLac');
-const pregBlock=$('pregBlock'), prePregW=$('prePregW'), lblPreW=$('lblPreW'), pregWeek=$('pregWeek'), lblPregWeek=$('lblPregWeek');
-const lacBlock=$('lacBlock'), litter=$('litter'), lblLitter=$('lblLitter'), lacWeek=$('lacWeek'), lblLacWeek=$('lblLacWeek');
-const calcBtn=$('calcBtn'), resetBtn=$('resetBtn'), errorAll=$('errorAll');
-const r1k=$('r1k'), r2k=$('r2k'), r3k=$('r3k'), r1v=$('r1v'), r2v=$('r2v'), r3v=$('r3v'), copyright=$('copyright');
+// Elements
+const gender = document.getElementById('gender');
+const inputsCard = document.getElementById('inputsCard');
+const resultsCard = document.getElementById('resultsCard');
+const wCurrent = document.getElementById('wCurrent');
+const ageCat = document.getElementById('ageCat');
+const rowWeekMonth = document.getElementById('row-week-month');
+const weekSel = document.getElementById('weekSel');
+const monthSel = document.getElementById('monthSel');
+const rowActivity = document.getElementById('row-activity');
+const activity = document.getElementById('activity');
+const reproRow = document.getElementById('reproRow');
+const pregnant = document.getElementById('pregnant');
+const lactating = document.getElementById('lactating');
+const pregRow = document.getElementById('pregRow');
+const wPrior = document.getElementById('wPrior');
+const pregWeek = document.getElementById('pregWeek');
+const lactRow = document.getElementById('lactRow');
+const kittenCount = document.getElementById('kittenCount');
+const lactWeek = document.getElementById('lactWeek');
+const err = document.getElementById('err');
 
-/* ---------- UI builders ---------- */
-function refillBaseNumber(){
-  const i = I18N[LANG];
-  baseNumber.innerHTML='';
-  const cat=baseCategory.value;
-  if(cat==='kitten_small'){ for(let w=5; w<=16; w++){ const o=document.createElement('option'); o.value=String(w); o.textContent=i.week(w); baseNumber.appendChild(o);} }
-  else if(cat==='kitten_mid'){ for(let m=5; m<=12; m++){ const o=document.createElement('option'); o.value=String(m); o.textContent=i.month(m); baseNumber.appendChild(o);} }
+const calcBtn = document.getElementById('calcBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const outCal = document.getElementById('out-cal');
+const outMeals = document.getElementById('out-meals');
+const outFree = document.getElementById('out-free');
+
+// i18n label refs
+const L = {
+  title:document.getElementById('title'),
+  secGender:document.getElementById('sec-gender'),
+  labGender:document.getElementById('lab-gender'),
+  secInputs:document.getElementById('sec-inputs'),
+  labWeight:document.getElementById('lab-weight'),
+  labCat:document.getElementById('lab-cat'),
+  labWeek:document.getElementById('lab-week'),
+  labMonth:document.getElementById('lab-month'),
+  labActivity:document.getElementById('lab-activity'),
+  labPreg:document.getElementById('lab-preg'),
+  labLact:document.getElementById('lab-lact'),
+  labWprior:document.getElementById('lab-wprior'),
+  labPweek:document.getElementById('lab-pweek'),
+  labKcount:document.getElementById('lab-kcount'),
+  labLweek:document.getElementById('lab-lweek'),
+  btnCalc:document.getElementById('calcBtn'),
+  btnReset:document.getElementById('resetBtn'),
+  secResults:document.getElementById('sec-results'),
+  labCal:document.getElementById('lab-cal'),
+  labMeals:document.getElementById('lab-meals'),
+  labFree:document.getElementById('lab-free'),
+  copyright:document.getElementById('copyright')
+};
+
+let lang = 'ar';
+function setLang(newLang){
+  lang = newLang;
+  document.documentElement.dir = (lang==='ar')?'rtl':'ltr';
+  document.documentElement.lang = lang==='ar'?'ar':'en';
+  document.getElementById('lang-ar').classList.toggle('active', lang==='ar');
+  document.getElementById('lang-en').classList.toggle('active', lang==='en');
+  const t = i18n[lang];
+  L.title.textContent = t.title;
+  L.secGender.textContent = t.secGender;
+  L.labGender.textContent = t.labGender;
+  L.secInputs.textContent = t.secInputs;
+  L.labWeight.textContent = t.labWeight;
+  L.labCat.textContent = t.labCat;
+  L.labWeek.textContent = t.labWeek;
+  L.labMonth.textContent = t.labMonth;
+  L.labActivity.textContent = t.labActivity;
+  L.labPreg.textContent = t.labPreg;
+  L.labLact.textContent = t.labLact;
+  L.labWprior.textContent = t.labWprior;
+  L.labPweek.textContent = t.labPweek;
+  L.labKcount.textContent = t.labKcount;
+  L.labLweek.textContent = t.labLweek;
+  L.btnCalc.textContent = t.btnCalc;
+  L.btnReset.textContent = t.btnReset;
+  L.secResults.textContent = t.secResults;
+  L.labCal.textContent = t.dailyCal;
+  L.labMeals.textContent = t.meals;
+  L.labFree.textContent = t.freeLabel;
+  L.copyright.textContent = t.copyright;
+
+  // Update placeholders & choices
+  wCurrent.placeholder = (lang==='ar')?'مثال: ٠٫٩':'e.g., 0.9';
+  wPrior.placeholder   = (lang==='ar')?'مثال: ٣٫٨':'e.g., 3.8';
+
+  // Age/base condition list changes by gender (wording neutered)
+  refreshAgeOptions();
+  refreshVisibility();
+  renderResults(0,0,false,0);
 }
-function refreshBaseControls(){
-  const c=baseCategory.value;
-  baseNumberWrap.classList.add('hide'); adultActivityWrap.classList.add('hide');
-  if(c==='kitten_small'||c==='kitten_mid') baseNumberWrap.classList.remove('hide');
-  if(c==='adult'||c==='spayed') adultActivityWrap.classList.remove('hide');
 
-  // Reproductive visibility rules
-  const isMale = (sex.value==='male');
-  let pregAllowed=true, lacAllowed=true, showToggles=true;
-  if(isMale){ pregAllowed=false; lacAllowed=false; showToggles=false; }
-  if(c==='spayed'){ pregAllowed=false; lacAllowed=false; showToggles=false; }
-  if(c==='kitten_small'){
-    const wk=parseInt(baseNumber.value||'0',10);
-    pregAllowed = (wk===16); // only week 16
-    lacAllowed = false;       // never for small kittens
-    showToggles = pregAllowed; // show toggles only if pregnancy is allowed at week 16
+function refreshAgeOptions(){
+  const isMale = (gender.value==='male');
+  ageCat.options.length = 0;
+  ageCat.add(new Option('—',''));
+  ageCat.add(new Option(i18n[lang].kitten,'kitten'));
+  ageCat.add(new Option(i18n[lang].junior,'junior'));
+  // adult wording depends on gender
+  const adultLabel = isMale? i18n[lang].adult_m : i18n[lang].adult_f;
+  ageCat.add(new Option(adultLabel,'adult'));
+  // neutered wording depends on gender
+  const neutLabel = isMale? i18n[lang].neutered_m : i18n[lang].neutered_f;
+  ageCat.add(new Option(neutLabel,'neutered'));
+}
+
+function fillWeeks(){
+  weekSel.options.length = 0;
+  for(let w=5; w<=16; w++) weekSel.add(new Option((lang==='ar'?'الأسبوع ':'Week ')+w, String(w)));
+  monthSel.options.length = 0;
+  for(let m=5; m<=12; m++) monthSel.add(new Option((lang==='ar'?'الشهر ':'Month ')+m, String(m)));
+}
+fillWeeks();
+
+function show(el, flag){ el.classList.toggle('hidden', !flag); }
+
+function refreshVisibility(){
+  const g = gender.value;
+  const cat = ageCat.value;
+
+  // Show inputs only after gender is chosen
+  show(inputsCard, !!g);
+
+  // reset sub-sections
+  show(rowWeekMonth,false); show(rowActivity,false); show(reproRow,false);
+  show(pregRow,false); show(lactRow,false);
+
+  if(!g || !cat) return;
+
+  if(cat==='kitten'){
+    show(rowWeekMonth,true);
+    document.getElementById('lab-month').parentElement.classList.add('hidden');
+    document.getElementById('lab-week').parentElement.classList.remove('hidden');
+
+    // Reproduction visibility rules for kittens
+    if(g==='female'){
+      const wk = parseInt(weekSel.value||'5',10);
+      // Per your request: at week 16 show Lactation only; otherwise nothing.
+      const showPreg = false;
+      const showLact = (wk===16);
+      show(reproRow, (showPreg||showLact));
+      show(pregRow, false);
+      pregnant.checked = false;
+      show(lactRow, showLact);
+      lactating.checked = showLact?true:false; // auto select if visible? keep unchecked
+    } else {
+      // male kittens: never show
+      show(reproRow,false); show(pregRow,false); show(lactRow,false);
+      pregnant.checked=false; lactating.checked=false;
+    }
+  } else if(cat==='junior'){
+    show(rowWeekMonth,true);
+    document.getElementById('lab-week').parentElement.classList.add('hidden');
+    document.getElementById('lab-month').parentElement.classList.remove('hidden');
+    if(g==='female'){
+      // allow both toggles
+      show(reproRow,true);
+      show(pregRow,pregnant.checked);
+      show(lactRow,lactating.checked);
+    } else {
+      show(reproRow,false); show(pregRow,false); show(lactRow,false);
+      pregnant.checked=false; lactating.checked=false;
+    }
+  } else if(cat==='adult' || cat==='neutered'){
+    show(rowActivity,true);
+    if(g==='female'){
+      // adult female (intact) can be pregnant/lactating; neutered female cannot
+      const allowRepro = (cat==='adult');
+      show(reproRow, allowRepro);
+      if(!allowRepro){ pregnant.checked=false; lactating.checked=false; }
+      show(pregRow, allowRepro && pregnant.checked);
+      show(lactRow, allowRepro && lactating.checked);
+    } else { // male adult
+      show(reproRow,false); show(pregRow,false); show(lactRow,false);
+      pregnant.checked=false; lactating.checked=false;
+    }
   }
-  if(c==='kitten_mid'){ showToggles = true; } // female adolescent can be pregnant / lactating per toggles
-
-  reproToggles.classList.toggle('hide', !showToggles);
-  isPreg.disabled = !pregAllowed; if(!pregAllowed) isPreg.checked=false;
-  isLac.disabled  = !lacAllowed;  if(!lacAllowed)  isLac.checked=false;
-  pregBlock.classList.toggle('hide', !(showToggles && isPreg.checked));
-  lacBlock.classList.toggle('hide',  !(showToggles && isLac.checked));
-}
-function rebuildUITexts(){
-  const i=I18N[LANG];
-  document.documentElement.lang=LANG; document.documentElement.dir=i.dir;
-  appTitle.textContent=i.appTitle;
-  secGateTitle.textContent=i.gateTitle; lblSexGate.textContent=i.sex;
-  secInputs.textContent=i.inputs; secResults.textContent=i.results;
-  lblW.textContent=i.w; wcur.placeholder=i.wPh; lblBase.textContent=i.base;
-  txtPreg.textContent=i.preg; txtLac.textContent=i.lact;
-  lblPreW.textContent=i.preW; prePregW.placeholder=i.preWph; lblPregWeek.textContent=i.pregWeek;
-  lblLitter.textContent=i.litter; lblLacWeek.textContent=i.lacWeek;
-  calcBtn.textContent=i.calc; resetBtn.textContent=i.reset;
-  r1k.textContent=i.daily; r2k.textContent=i.meals; r3k.textContent=i.free; copyright.textContent=i.copyright;
-
-  const currentSex = sex.value;
-  const currentBase = baseCategory.value;
-  const currentActivity = adultActivity.value;
-  const currentBaseNum = baseNumber.value;
-
-  setSelectOptions(sex, i.sexOptions, currentSex);
-
-  const male = (sex.value==='male');
-  const baseArr = male ?
-    [['kitten_small',i.small_m],['kitten_mid',i.mid_m],['adult',i.adult_m],['spayed',i.spayed_m]] :
-    [['kitten_small',i.small_f],['kitten_mid',i.mid_f],['adult',i.adult_f],['spayed',i.spayed_f]];
-  setSelectOptions(baseCategory, baseArr, currentBase || 'kitten_small');
-
-  setSelectOptions(adultActivity, [['low',i.low],['med',i.med],['high',i.high]], currentActivity || 'low');
-  setSelectOptions(pregWeek, i.pregWeeks);
-  const lacWeeks=[]; for(let w=1; w<=10; w++) lacWeeks.push([String(w), i.week(w)]);
-  setSelectOptions(lacWeek, lacWeeks);
-  setSelectOptions(litter, i.kittenCounts);
-  refillBaseNumber();
-  if(currentBaseNum) baseNumber.value=currentBaseNum;
-  refreshBaseControls();
 }
 
-/* ---------- language + sex handlers ---------- */
-function setLang(lang){
-  LANG=lang;
-  document.getElementById('btnAR').classList.toggle('active', LANG==='ar');
-  document.getElementById('btnEN').classList.toggle('active', LANG==='en');
-  rebuildUITexts();
-}
-function onSexChange(){
-  if(sex.value){
-    calcGrid.classList.remove('hide');
-  }else{
-    calcGrid.classList.add('hide');
-  }
-  rebuildUITexts();
-}
+gender.addEventListener('change', ()=>{refreshAgeOptions(); refreshVisibility();});
+ageCat.addEventListener('change', refreshVisibility);
+weekSel.addEventListener('change', refreshVisibility);
+monthSel.addEventListener('change', refreshVisibility);
+activity.addEventListener('change', refreshVisibility);
+pregnant.addEventListener('change', ()=>{refreshVisibility();});
+lactating.addEventListener('change', ()=>{refreshVisibility();});
 
-/* ---------- validation & calculations ---------- */
-function showError(msg){ errorAll.textContent=msg; errorAll.style.display='block'; }
-function clearError(){ errorAll.textContent=''; errorAll.style.display='none'; }
+function parseNum(x){
+  if(!x) return NaN;
+  // support Arabic/English numerals and comma/decimal
+  const s = (''+x).replace(/[٠-٩]/g, d=> '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(',', '.');
+  return parseFloat(s);
+}
 
 function calc(){
-  clearError();
-  const i=I18N[LANG];
-  const w=parseFloat(toASCII(wcur.value));
-  if(!(w>0)){ showError(i.errW); return; }
+  err.classList.add('hidden'); err.textContent='';
 
-  const cat=baseCategory.value;
-  let A=1;
-  if(cat==='kitten_small'){
-    const wk=parseInt(baseNumber.value,10);
-    if(!(wk>=5 && wk<=16)){ showError(i.errWeeks); return; }
-    A=A_small[wk];
-  }else if(cat==='kitten_mid'){
-    const mo=parseInt(baseNumber.value,10);
-    if(!(mo>=5 && mo<=12)){ showError(i.errMonths); return; }
-    A=A_mid[mo];
-  }else if(cat==='adult'){ A=A_adult[adultActivity.value]; }
-  else if(cat==='spayed'){ A=A_spayed[adultActivity.value]; }
+  const t = i18n[lang];
+  const Wc = parseNum(wCurrent.value);
+  if(!(Wc>0)){ err.textContent=t.errWeight; err.classList.remove('hidden'); renderResults(0,0,false,0); return; }
 
-  let P=1, weightAdj=1;
-  if(isPreg.checked){
-    const wk=pregWeek.value;
-    const wprior=parseFloat(toASCII(prePregW.value));
-    if(!(wprior>0)){ showError(i.errPreW); return; }
-    P=P_preg[wk];
-    weightAdj = 1.0 / Math.pow((w / wprior), 0.67);
+  const g = gender.value, cat = ageCat.value;
+  if(!g || !cat){ renderResults(0,0,false,0); return; }
+
+  // Base multipliers
+  let A=1, baseFree=false;
+  if(cat==='kitten'){
+    const w = parseInt(weekSel.value||'5',10);
+    A = (A_SMALL[w]||{a:1}).a; baseFree = (A_SMALL[w]||{free:false}).free;
+  } else if(cat==='junior'){
+    const m = parseInt(monthSel.value||'5',10);
+    A = (A_JUNIOR[m]||{a:1}).a; baseFree = (A_JUNIOR[m]||{free:false}).free;
+  } else if(cat==='adult'){
+    const act = activity.value||'med';
+    A = A_ADULT[act].a; baseFree = A_ADULT[act].free;
+  } else if(cat==='neutered'){
+    const act = activity.value||'med';
+    A = A_NEUTERED[act].a; baseFree = A_NEUTERED[act].free;
   }
 
-  let L=1, freeAllowed=false;
-  if(isLac.checked){
-    const lw=parseInt(lacWeek.value,10);
-    const lc=litter.value;
-    L = L_lac[lw][lc];
-    freeAllowed = (L>=2.2);
-  }else{
-    if(cat==='kitten_small'){
-      const wk=parseInt(baseNumber.value,10);
-      freeAllowed = (wk>=5 && wk<=14);
-    }else if(cat==='adult' && adultActivity.value==='high'){ freeAllowed=true; }
-    else if(cat==='spayed' && adultActivity.value==='high'){ freeAllowed=true; }
+  // Pregnancy / Lactation
+  let P=1, L=1, pregFree=false, lactFree=false;
+
+  if(g==='female'){
+    if(pregnant.checked){
+      // require prior weight
+      const Wp = parseNum(wPrior.value);
+      if(!(Wp>0)){
+        err.textContent = t.errWprior; err.classList.remove('hidden'); renderResults(0,0,false,0); return;
+      }
+      const pw = pregWeek.value; const row = P_TABLE[pw]||{p:1,free:false};
+      P = row.p; pregFree = row.free;
+      // apply denominator term (Wc/Wp)^0.67
+      A = A; // unchanged
+      // we'll include the ratio outside
+      var ratio = Math.pow(Wc/Wp, 0.67);
+      var pregDenom = ratio>0? ratio : 1;
+      // We'll multiply by P / ratio later
+      var pregAdj = P / pregDenom;
+      P = pregAdj;
+    }
+    if(lactating.checked){
+      const kc = kittenCount.value||'le2';
+      const lw = lactWeek.value||'1';
+      const row = (L_TABLE[kc]||{})[lw] || {l:1,free:false};
+      L = row.l; lactFree = row.free;
+    }
   }
 
-  const calories = 100 * Math.pow(w,0.67) * A * P * weightAdj * L;
-  let meals = Math.max(1, Math.round(calories / (40*w)));
-  let freeText=i.freeNo;
+  const freeAllowed = !!(baseFree || pregFree || lactFree);
+
+  // Calories
+  const C = 100 * Math.pow(Wc, 0.67) * A * P * L;
+
+  // Meals logic
+  const perMeal = 40 * Wc; // kcal
+  let meals, freeGram=0;
   if(freeAllowed){
-    const N = Math.max(1, Math.round(calories/(40*w)));
-    const deltaC = calories - N*(40*w);
-    const dry = Math.max(0, deltaC/4);
-    freeText = I18N[LANG].freeYes(dry.toFixed(2));
-    meals = N;
+    let n = Math.floor(C / perMeal) - 1;
+    if(n < 1) n = 1; // at least one meal
+    const deltaC = Math.max(0, C - n*perMeal);
+    freeGram = deltaC / 4.0;
+    meals = n;
+  }else{
+    let n = Math.floor(C / perMeal);
+    if(n < 1) n = 1;
+    meals = n;
+    freeGram = 0;
   }
-  r1v.textContent = calories.toFixed(2) + ' kcal';
-  r2v.textContent = String(meals);
-  r3v.textContent = freeText;
+
+  renderResults(C, meals, freeAllowed, freeGram);
 }
 
-function resetAll(){
-  wcur.value=''; prePregW.value=''; isPreg.checked=false; isLac.checked=false;
-  r1v.textContent='0 kcal'; r2v.textContent='0'; r3v.textContent='—'; clearError();
-  rebuildUITexts();
+function renderResults(C, meals, freeAllowed, g){
+  const t = i18n[lang];
+  outCal.textContent = `${C.toFixed(2)} kcal`;
+  outMeals.textContent = `${meals}`;
+  outFree.textContent = freeAllowed ? t.freeYes(g) : t.freeNo;
+  show(resultsCard, true);
 }
 
-/* ---------- wire events & init ---------- */
-document.getElementById('btnAR').addEventListener('click', ()=>setLang('ar'));
-document.getElementById('btnEN').addEventListener('click', ()=>setLang('en'));
-sex.addEventListener('change', onSexChange);
-baseCategory.addEventListener('change', ()=>{ refillBaseNumber(); refreshBaseControls(); });
-baseNumber.addEventListener('change', refreshBaseControls);
-isPreg.addEventListener('change', ()=>{pregBlock.classList.toggle('hide', !isPreg.checked)});
-isLac.addEventListener('change', ()=>{lacBlock.classList.toggle('hide', !isLac.checked)});
 calcBtn.addEventListener('click', calc);
-resetBtn.addEventListener('click', resetAll);
+resetBtn.addEventListener('click', ()=>{
+  document.getElementById('gender').value='';
+  wCurrent.value=''; ageCat.value='';
+  weekSel.value='5'; monthSel.value='5';
+  activity.value='med'; pregnant.checked=false; lactating.checked=false;
+  wPrior.value=''; pregWeek.value='1-4'; kittenCount.value='le2'; lactWeek.value='1';
+  err.classList.add('hidden'); show(inputsCard,false); show(resultsCard,false);
+});
 
-function init(){
-  setSelectOptions(sex, I18N[LANG].sexOptions);
-  calcGrid.classList.add('hide');
-  rebuildUITexts();
-}
-init();
+// Pre-populate selectors
+weekSel.value='5'; monthSel.value='5'; activity.value='med';
+
+// Initialize
+setLang('ar');
 </script>
 </body>
 </html>
