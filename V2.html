@@ -263,6 +263,8 @@ function refreshBaseControls(){
 
   // Apply
   reproToggles.classList.toggle('hide', !showToggles);
+      document.getElementById('lacToggle').classList.toggle('hide', !lacAllowed);
+      
   // never show for male
   if(isMale){ isPreg.checked=false; isLac.checked=false; }
   isPreg.disabled=!pregAllowed; if(!pregAllowed) isPreg.checked=false;
@@ -367,14 +369,7 @@ function calc(){
     const lw=parseInt(lacWeek.value,10);
     const lc=litter.value;
     L = L_lac[lw][lc];
-    // Revised free-feeding logic for lactation weeks:
-    // Weeks 1-8: free-feeding allowed
-    // Week 9: no free-feeding
-    // Week 10: do not count lactation toward free-feeding; use A condition with free-feeding rounding
-    if(lw>=1 && lw<=8){ lacFree = true; }
-    else if(lw===9){ lacFree = false; }
-    else if(lw===10){ lacFree = true; L = 1.0; }
-    else { lacFree = (L>=2.2); }
+    lacFree = (L>=2.2);
   }
 
   const freeAllowed = !!(baseFree || pregFree || lacFree);
