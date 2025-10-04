@@ -367,7 +367,14 @@ function calc(){
     const lw=parseInt(lacWeek.value,10);
     const lc=litter.value;
     L = L_lac[lw][lc];
-    lacFree = (L>=2.2);
+    // Revised free-feeding logic for lactation weeks:
+    // Weeks 1-8: free-feeding allowed
+    // Week 9: no free-feeding
+    // Week 10: do not count lactation toward free-feeding; use A condition with free-feeding rounding
+    if(lw>=1 && lw<=8){ lacFree = true; }
+    else if(lw===9){ lacFree = false; }
+    else if(lw===10){ lacFree = true; L = 1.0; }
+    else { lacFree = (L>=2.2); }
   }
 
   const freeAllowed = !!(baseFree || pregFree || lacFree);
@@ -377,14 +384,14 @@ function calc(){
   const perMeal = 40*w;
   let meals, freeText=i.freeNo;
   if(freeAllowed){
-    let n = Math.ceil(calories / perMeal) - 1;
+    let n = Math.floor(calories / perMeal) - 1;
     if(n < 1) n = 1;
     const deltaC = Math.max(0, calories - n*perMeal);
     const dry = Math.max(0, deltaC/4);
     freeText = I18N[LANG].freeYes(dry.toFixed(2));
     meals = n;
   }else{
-    let n = Math.ceil(calories / perMeal);
+    let n = Math.floor(calories / perMeal);
     if(n < 1) n = 1;
     meals = n;
     freeText = i.freeNo;
