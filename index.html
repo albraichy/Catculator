@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>حاسبة سعرات القط 🐾 — V11</title>
+<title>حاسبة سعرات القط 🐾 — V12</title>
 <style>
   :root{--bg:#0b0e14;--card:#111623;--text:#eaf1ff;--muted:#98a2b3;--line:#1f2633;--danger:#ff6b6b;}
   *{box-sizing:border-box}
@@ -155,7 +155,8 @@ const els = {
   litterLabel: document.getElementById('litterLabel')
 };
 
-(function(){ for(let i=0;i<=10;i++){ const o=document.createElement('option'); o.value=String(i); o.textContent=(i===0?'افتراضي':'الأسبوع '+i); els.lacWeek.appendChild(o);} })();
+// Lactation weeks 1..10 (بدون "افتراضي")
+(function(){ for(let i=1;i<=10;i++){ const o=document.createElement('option'); o.value=String(i); o.textContent='الأسبوع '+i; els.lacWeek.appendChild(o);} })();
 
 const A_small = {5:2.50,6:2.45,7:2.40,8:2.35,9:2.30,10:2.25,11:2.20,12:2.15,13:2.10,14:2.10,15:2.00,16:2.00};
 const A_mid   = {5:1.95,6:1.90,7:1.85,8:1.80,9:1.75,10:1.50,11:1.50,12:1.50};
@@ -163,7 +164,6 @@ const A_adult   = { low:0.90, med:1.00, high:1.10 };
 const A_spayed  = { low:0.75, med:0.85, high:0.95 };
 const P_preg = { '1-4':1.00, '5':1.10, '6':1.20, '7':1.30, '8':1.40, '9':1.45 };
 const L_lac = {
-  0:  { 'le2':1.0,  '3-4':1.0,  '5-6':1.0,  'ge7':1.0 },
   1:  { 'le2':1.6,  '3-4':1.8,  '5-6':2.0,  'ge7':2.2 },
   2:  { 'le2':1.8,  '3-4':2.2,  '5-6':2.5,  'ge7':2.7 },
   3:  { 'le2':2.0,  '3-4':2.5,  '5-6':2.8,  'ge7':3.0 },
@@ -183,8 +183,6 @@ function setCategoryOptionLabels(){
   opts[1].textContent = male ? 'متوسط (٥–١٢ شهر)' : 'متوسطة (٥–١٢ شهر)';
   opts[2].textContent = male ? 'بالغ (أكبر من سنة)' : 'بالغة (أكبر من سنة)';
   opts[3].textContent = male ? 'معقّم' : 'معقمة';
-  document.getElementById('pregLabel').childNodes[1].nodeValue = male ? ' حامل' : ' حامل';
-  document.getElementById('lacLabel').childNodes[1].nodeValue  = male ? ' مُرضِع' : ' مرضعة';
   document.getElementById('litterLabel').textContent = male ? 'عدد الصغار' : 'عدد الصغار';
 }
 
@@ -196,6 +194,8 @@ function fillBaseNumberOptions(){
   } else if(cat==='kitten_mid'){
     for(let m=5; m<=12; m++){ const o=document.createElement('option'); o.value=String(m); o.textContent='الشهر '+m; els.baseNum.appendChild(o); }
   }
+  // trigger evaluation when user changes number
+  els.baseNum.onchange = toggleBlocks;
 }
 
 function gateBySex(){
@@ -211,45 +211,48 @@ function toggleBlocks(){
   els.adultActWrap.classList.toggle('hide', !adultMode);
   fillBaseNumberOptions();
 
-  // 1) Male => hide repro entirely
+  // Male => hide all reproduction
   if(els.sex.value==='male'){
     document.getElementById('reproToggles').classList.add('hide');
     els.pregBlock.classList.add('hide');
     els.lacBlock.classList.add('hide');
     els.isPreg.checked=false; els.isLac.checked=false;
+    els.isPreg.disabled=true; els.isLac.disabled=true;
     return;
   }
 
-  // 2) Spayed female => hide repro
+  // Spayed female => hide all reproduction
   if(cat==='spayed'){
     document.getElementById('reproToggles').classList.add('hide');
     els.pregBlock.classList.add('hide');
     els.lacBlock.classList.add('hide');
     els.isPreg.checked=false; els.isLac.checked=false;
+    els.isPreg.disabled=true; els.isLac.disabled=true;
     return;
   }
 
-  // 3) Kitten small: show only pregnancy at week 16; lactation never
+  // Kitten small: pregnancy allowed only at week 16; lactation never
   if(cat==='kitten_small'){
     const wk = parseInt(els.baseNum.value||'5');
     const allowPreg = (wk===16);
-    // toggles visibility
     document.getElementById('reproToggles').classList.toggle('hide', !allowPreg);
-    // inside: show only pregnancy toggle
     document.getElementById('pregLabel').classList.toggle('hide', !allowPreg);
     document.getElementById('lacLabel').classList.add('hide');
-    // blocks
-    els.pregBlock.classList.toggle('hide', !(allowPreg && els.isPreg.checked));
-    els.lacBlock.classList.add('hide');
+    els.isPreg.disabled = !allowPreg;
     if(!allowPreg){ els.isPreg.checked=false; }
     els.isLac.checked=false;
+    els.isLac.disabled=true;
+    els.pregBlock.classList.toggle('hide', !(allowPreg && els.isPreg.checked));
+    els.lacBlock.classList.add('hide');
     return;
   }
 
-  // 4) Other female categories: show both toggles normally
+  // Other female categories
   document.getElementById('reproToggles').classList.remove('hide');
   document.getElementById('pregLabel').classList.remove('hide');
   document.getElementById('lacLabel').classList.remove('hide');
+  els.isPreg.disabled=false;
+  els.isLac.disabled=false;
   els.pregBlock.classList.toggle('hide', !els.isPreg.checked);
   els.lacBlock.classList.toggle('hide', !els.isLac.checked);
 }
