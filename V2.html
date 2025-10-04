@@ -510,3 +510,50 @@ init();
 
 </body>
 </html>
+
+<!-- ===== Tiny visibility patch for 16-week female kittens ===== -->
+<script>
+(() => {
+  function applyRule() {
+    const sexSel = document.getElementById('sex');
+    const baseCat = document.getElementById('baseCategory');
+    const baseNum = document.getElementById('baseNumber');
+    const pregBlock = document.getElementById('pregBlock');
+    const lacBlock  = document.getElementById('lacBlock');
+    if (!sexSel || !baseCat || !baseNum || !pregBlock || !lacBlock) return;
+
+    const sex = sexSel.value;                               // 'male' | 'female'
+    const base = baseCat.value;                             // 'kitten_small' | 'kitten_junior' | 'adult' | 'neutered'
+    const week = baseNum.value;                             // '5'..'16' for kitten_small
+    
+    // Defaults: show both blocks (engine will also enforce) 
+    pregBlock.style.display = '';
+    lacBlock.style.display  = '';
+
+    if (sex === 'male') {                                   // males: never show repro controls
+      pregBlock.style.display = 'none';
+      lacBlock.style.display  = 'none';
+      return;
+    }
+    if (base === 'kitten_small') {                          // small kittens (2–4 mo)
+      if (week === '16') {                                  // only pregnancy allowed at week 16
+        pregBlock.style.display = '';
+        lacBlock.style.display  = 'none';
+      } else {                                              // weeks 5–15: hide both
+        pregBlock.style.display = 'none';
+        lacBlock.style.display  = 'none';
+      }
+    }
+  }
+  function wire() {
+    document.addEventListener('change', applyRule, true);
+    const obs = new MutationObserver(applyRule);
+    obs.observe(document.documentElement, {subtree:true, childList:true});
+    applyRule();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wire);
+  } else { wire(); }
+})();
+</script>
+<!-- ===== End patch ===== -->
