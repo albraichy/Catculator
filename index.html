@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>حاسبة سعرات القط 🐾 — V12</title>
+<title>حاسبة سعرات القط 🐾 — V13</title>
 <style>
   :root{--bg:#0b0e14;--card:#111623;--text:#eaf1ff;--muted:#98a2b3;--line:#1f2633;--danger:#ff6b6b;}
   *{box-sizing:border-box}
@@ -33,8 +33,8 @@
 
 <div class="wrap">
   <div class="card">
-    <label id="sexLabel">جنس القطة</label>
-    <select id="sex" onchange="gateBySex()">
+    <label>جنس القطة</label>
+    <select id="sex">
       <option value="">اختر…</option>
       <option value="male">ذكر</option>
       <option value="female">أنثى</option>
@@ -42,12 +42,12 @@
   </div>
 
   <div id="mainForm" class="card hide">
-    <label id="wLabel">الوزن الحالي (كجم)</label>
+    <label>الوزن الحالي (كجم)</label>
     <input id="wcur" type="text" inputmode="decimal" placeholder="مثال: ٠٫٩">
 
-    <label id="catLabel" style="margin-top:10px">الفئة العمرية/الحالة الأساسية</label>
+    <label style="margin-top:10px">الفئة العمرية/الحالة الأساسية</label>
     <div class="row">
-      <select id="baseCategory" onchange="toggleBlocks()">
+      <select id="baseCategory">
         <option value="kitten_small">صغيرة (٢–٤ أشهر)</option>
         <option value="kitten_mid">متوسطة (٥–١٢ شهر)</option>
         <option value="adult">بالغة (أكبر من سنة)</option>
@@ -68,13 +68,13 @@
     </div>
 
     <div id="reproToggles" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
-      <label id="pregLabel" style="display:flex;align-items:center;gap:8px"><input id="isPreg" type="checkbox" style="width:auto" onchange="toggleBlocks()"> حامل</label>
-      <label id="lacLabel"  style="display:flex;align-items:center;gap:8px"><input id="isLac"  type="checkbox" style="width:auto" onchange="toggleBlocks()"> مرضعة</label>
+      <label id="pregLabel" style="display:flex;align-items:center;gap:8px"><input id="isPreg" type="checkbox" style="width:auto"> حامل</label>
+      <label id="lacLabel"  style="display:flex;align-items:center;gap:8px"><input id="isLac"  type="checkbox" style="width:auto"> مرضعة</label>
     </div>
 
     <div id="pregBlock" class="row hide" style="margin-top:6px">
       <div>
-        <label id="prePregWLabel">الوزن قبل الحمل (كجم)</label>
+        <label>الوزن قبل الحمل (كجم)</label>
         <input id="prePregW" type="text" inputmode="decimal" placeholder="مثال: ٣٫٨">
       </div>
       <div>
@@ -92,7 +92,7 @@
 
     <div id="lacBlock" class="row hide" style="margin-top:6px">
       <div>
-        <label id="litterLabel">عدد الصغار</label>
+        <label>عدد الصغار</label>
         <select id="litter">
           <option value="le2">≤٢</option>
           <option value="3-4">٣–٤</option>
@@ -108,7 +108,7 @@
 
     <div id="errorAll" class="error"></div>
 
-    <button id="calcBtn" onclick="computeOnce()">احسب النتائج</button>
+    <button id="calcBtn">احسب النتائج</button>
   </div>
 
   <div class="card">
@@ -145,17 +145,10 @@ const els = {
   litter: document.getElementById('litter'),
   lacWeek: document.getElementById('lacWeek'),
   errorAll: document.getElementById('errorAll'),
-  result: document.getElementById('resultBox'),
-  sexLabel: document.getElementById('sexLabel'),
-  wLabel: document.getElementById('wLabel'),
-  catLabel: document.getElementById('catLabel'),
-  pregLabel: document.getElementById('pregLabel'),
-  lacLabel: document.getElementById('lacLabel'),
-  prePregWLabel: document.getElementById('prePregWLabel'),
-  litterLabel: document.getElementById('litterLabel')
+  result: document.getElementById('resultBox')
 };
 
-// Lactation weeks 1..10 (بدون "افتراضي")
+// Lactation weeks 1..10
 (function(){ for(let i=1;i<=10;i++){ const o=document.createElement('option'); o.value=String(i); o.textContent='الأسبوع '+i; els.lacWeek.appendChild(o);} })();
 
 const A_small = {5:2.50,6:2.45,7:2.40,8:2.35,9:2.30,10:2.25,11:2.20,12:2.15,13:2.10,14:2.10,15:2.00,16:2.00};
@@ -176,40 +169,36 @@ const L_lac = {
   10: { 'le2':1.0,  '3-4':1.0,  '5-6':1.0,  'ge7':1.0 }
 };
 
-function setCategoryOptionLabels(){
-  const male = (els.sex.value==='male');
-  const opts = els.baseCat.options;
-  opts[0].textContent = male ? 'صغير (٢–٤ أشهر)' : 'صغيرة (٢–٤ أشهر)';
-  opts[1].textContent = male ? 'متوسط (٥–١٢ شهر)' : 'متوسطة (٥–١٢ شهر)';
-  opts[2].textContent = male ? 'بالغ (أكبر من سنة)' : 'بالغة (أكبر من سنة)';
-  opts[3].textContent = male ? 'معقّم' : 'معقمة';
-  document.getElementById('litterLabel').textContent = male ? 'عدد الصغار' : 'عدد الصغار';
-}
-
-function fillBaseNumberOptions(){
-  els.baseNum.innerHTML = '';
+let lastCat = null;
+function refillBaseNumberIfNeeded(){
   const cat = els.baseCat.value;
+  if(cat===lastCat) return; // don't reset user's selection unless category changed
+  const oldVal = els.baseNum.value;
+  els.baseNum.innerHTML='';
   if(cat==='kitten_small'){
     for(let w=5; w<=16; w++){ const o=document.createElement('option'); o.value=String(w); o.textContent='الأسبوع '+w; els.baseNum.appendChild(o); }
   } else if(cat==='kitten_mid'){
     for(let m=5; m<=12; m++){ const o=document.createElement('option'); o.value=String(m); o.textContent='الشهر '+m; els.baseNum.appendChild(o); }
   }
-  // trigger evaluation when user changes number
-  els.baseNum.onchange = toggleBlocks;
+  // try to preserve value if exists in new list
+  if(oldVal){
+    const opt = Array.from(els.baseNum.options).find(o=>o.value===oldVal);
+    if(opt) els.baseNum.value=oldVal;
+  }
+  lastCat = cat;
 }
 
 function gateBySex(){
   els.form.classList.toggle('hide', els.sex.value==='');
-  setCategoryOptionLabels();
   toggleBlocks();
 }
 
 function toggleBlocks(){
+  refillBaseNumberIfNeeded();
   const cat = els.baseCat.value;
   const adultMode = (cat==='adult' || cat==='spayed');
   els.baseNumWrap.classList.toggle('hide', adultMode);
   els.adultActWrap.classList.toggle('hide', !adultMode);
-  fillBaseNumberOptions();
 
   // Male => hide all reproduction
   if(els.sex.value==='male'){
@@ -358,6 +347,15 @@ function render(C,N,useFree,freeGrams){
       : '<div><span class="k">الأكل الحر:</span> بدون أكل حر</div>');
 }
 
+// listeners
+els.sex.addEventListener('change', gateBySex);
+els.baseCat.addEventListener('change', toggleBlocks);
+els.baseNum.addEventListener('change', toggleBlocks);
+els.isPreg.addEventListener('change', toggleBlocks);
+els.isLac.addEventListener('change', toggleBlocks);
+document.getElementById('calcBtn').addEventListener('click', computeOnce);
+
+// init
 gateBySex();
 </script>
 </body>
