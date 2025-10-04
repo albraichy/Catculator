@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>حاسبة سعرات القط 🐾 — V9</title>
+<title>حاسبة سعرات القط 🐾 — V10</title>
 <style>
   :root{--bg:#0b0e14;--card:#111623;--text:#eaf1ff;--muted:#98a2b3;--line:#1f2633;--danger:#ff6b6b;}
   *{box-sizing:border-box}
@@ -20,8 +20,8 @@
   .result{font-size:16px;line-height:1.9}
   .k{font-weight:700}
   .hide{display:none !important}
+  .muted{color:var(--muted);font-size:12px}
   button{cursor:pointer;margin-top:10px}
-  button:active{transform:translateY(1px)}
 </style>
 </head>
 <body>
@@ -34,6 +34,15 @@
 
 <div class="wrap">
   <div class="card">
+    <label>جنس القطة</label>
+    <select id="sex" onchange="gateBySex()">
+      <option value="">اختر…</option>
+      <option value="male">ذكر</option>
+      <option value="female">أنثى</option>
+    </select>
+  </div>
+
+  <div id="mainForm" class="card hide">
     <label>الوزن الحالي (كجم)</label>
     <input id="wcur" type="text" inputmode="decimal" placeholder="مثال: ٠٫٩">
 
@@ -47,7 +56,7 @@
       </select>
 
       <div id="baseNumberWrap">
-        <input id="baseNumber" type="text" inputmode="numeric" placeholder="أدخل الأسابيع (٥–١٦)">
+        <select id="baseNumber"></select>
       </div>
 
       <div id="adultActivityWrap" class="hide">
@@ -59,7 +68,7 @@
       </div>
     </div>
 
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+    <div id="reproToggles" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
       <label style="display:flex;align-items:center;gap:8px"><input id="isPreg" type="checkbox" style="width:auto" onchange="toggleBlocks()"> حامل</label>
       <label style="display:flex;align-items:center;gap:8px"><input id="isLac" type="checkbox" style="width:auto" onchange="toggleBlocks()"> مرضعة</label>
     </div>
@@ -101,6 +110,7 @@
     <div id="errorAll" class="error"></div>
 
     <button id="calcBtn" onclick="computeOnce()">احسب النتائج</button>
+    <div class="muted" id="logicNote"></div>
   </div>
 
   <div class="card">
@@ -118,10 +128,30 @@ function normalizeNumber(s){
   const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.',',':'.',' ':'','\u200f':''};
   return s.toString().split('').map(ch=>map[ch] ?? ch).join('');
 }
-(function(){
-  const lacWeek = document.getElementById('lacWeek');
-  for(let i=0;i<=10;i++){ const o=document.createElement('option'); o.value=String(i); o.textContent=(i===0?'افتراضي':'الأسبوع '+i); lacWeek.appendChild(o); }
-})();
+
+const els = {
+  sex: document.getElementById('sex'),
+  form: document.getElementById('mainForm'),
+  W: document.getElementById('wcur'),
+  baseCat: document.getElementById('baseCategory'),
+  baseNum: document.getElementById('baseNumber'),
+  baseNumWrap: document.getElementById('baseNumberWrap'),
+  adultAct: document.getElementById('adultActivity'),
+  adultActWrap: document.getElementById('adultActivityWrap'),
+  isPreg: document.getElementById('isPreg'),
+  isLac: document.getElementById('isLac'),
+  pregBlock: document.getElementById('pregBlock'),
+  prePregW: document.getElementById('prePregW'),
+  pregWeek: document.getElementById('pregWeek'),
+  lacBlock: document.getElementById('lacBlock'),
+  litter: document.getElementById('litter'),
+  lacWeek: document.getElementById('lacWeek'),
+  errorAll: document.getElementById('errorAll'),
+  result: document.getElementById('resultBox'),
+  logicNote: document.getElementById('logicNote')
+};
+
+(function(){ for(let i=0;i<=10;i++){ const o=document.createElement('option'); o.value=String(i); o.textContent=(i===0?'افتراضي':'الأسبوع '+i); els.lacWeek.appendChild(o);} })();
 
 const A_small = {5:2.50,6:2.45,7:2.40,8:2.35,9:2.30,10:2.25,11:2.20,12:2.15,13:2.10,14:2.10,15:2.00,16:2.00};
 const A_mid   = {5:1.95,6:1.90,7:1.85,8:1.80,9:1.75,10:1.50,11:1.50,12:1.50};
@@ -141,6 +171,75 @@ const L_lac = {
   9:  { 'le2':1.05, '3-4':1.2,  '5-6':1.25, 'ge7':1.3 },
   10: { 'le2':1.0,  '3-4':1.0,  '5-6':1.0,  'ge7':1.0 }
 };
+
+function fillBaseNumberOptions(){
+  els.baseNum.innerHTML = '';
+  const cat = els.baseCat.value;
+  if(cat==='kitten_small'){
+    for(let w=5; w<=16; w++){ const o=document.createElement('option'); o.value=String(w); o.textContent='الأسبوع '+w; els.baseNum.appendChild(o); }
+  } else if(cat==='kitten_mid'){
+    for(let m=5; m<=12; m++){ const o=document.createElement('option'); o.value=String(m); o.textContent='الشهر '+m; els.baseNum.appendChild(o); }
+  }
+}
+
+function gateBySex(){
+  els.form.classList.toggle('hide', els.sex.value==='');
+  toggleBlocks();
+}
+
+function toggleBlocks(){
+  const cat = els.baseCat.value;
+  const adultMode = (cat==='adult' || cat==='spayed');
+  els.baseNumWrap.classList.toggle('hide', adultMode);
+  els.adultActWrap.classList.toggle('hide', !adultMode);
+  fillBaseNumberOptions();
+
+  let showRepro = (els.sex.value==='female');
+  let pregAllowed=false, lacAllowed=false, note='';
+
+  if(showRepro){
+    if(cat==='spayed'){ showRepro=false; note='(أنثى معقمة: لا حمل ولا إرضاع)'; }
+    else if(cat==='kitten_small'){
+      const wk = parseInt(els.baseNum.value||'5');
+      pregAllowed = (wk>=16);
+      lacAllowed = false;
+      if(!pregAllowed) note='(صغيرة: خصوبة قبل ١٦ أسبوع غير متوقعة)';
+      else note='(صغيرة ١٦ أسبوع: الحمل نادر لكنه ممكن)';
+    } else {
+      pregAllowed = true;
+      lacAllowed = true;
+    }
+  }
+
+  document.getElementById('reproToggles').classList.toggle('hide', !showRepro);
+  els.isPreg.checked = showRepro && pregAllowed ? els.isPreg.checked : false;
+  els.isLac.checked  = showRepro && lacAllowed ? els.isLac.checked  : false;
+  els.isPreg.disabled = !pregAllowed;
+  els.isLac.disabled  = !lacAllowed;
+
+  els.pregBlock.classList.toggle('hide', !(showRepro && pregAllowed && els.isPreg.checked));
+  els.lacBlock.classList.toggle('hide',  !(showRepro && lacAllowed && els.isLac.checked));
+
+  els.logicNote.textContent = note;
+}
+
+function validateAll(){
+  let msgs = [];
+  const W = parseFloat(normalizeNumber(els.W.value));
+  if(!(W>0)) msgs.push('أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).');
+
+  const cat = els.baseCat.value;
+  if(cat==='kitten_small'){
+    const wk = parseInt(els.baseNum.value);
+    if(isNaN(wk) || wk<5 || wk>16) msgs.push('الأسابيع يجب أن تكون بين ٥ و ١٦.');
+  } else if(cat==='kitten_mid'){
+    const mo = parseInt(els.baseNum.value);
+    if(isNaN(mo) || mo<5 || mo>12) msgs.push('الأشهر يجب أن تكون بين ٥ و ١٢.');
+  }
+  els.errorAll.innerHTML = msgs.join('<br>');
+  els.errorAll.style.display = msgs.length? 'block':'none';
+  return {ok: msgs.length===0, W};
+}
 
 function freeFoodAllowed(state){
   if(state.cat==='kitten_small' && state.weeks) {
@@ -164,77 +263,20 @@ function freeFoodAllowed(state){
 
 const KCAL_PER_GRAM_DRY = 4;
 
-const els = {
-  W: document.getElementById('wcur'),
-  baseCat: document.getElementById('baseCategory'),
-  baseNum: document.getElementById('baseNumber'),
-  baseNumWrap: document.getElementById('baseNumberWrap'),
-  adultAct: document.getElementById('adultActivity'),
-  adultActWrap: document.getElementById('adultActivityWrap'),
-  isPreg: document.getElementById('isPreg'),
-  pregBlock: document.getElementById('pregBlock'),
-  prePregW: document.getElementById('prePregW'),
-  pregWeek: document.getElementById('pregWeek'),
-  isLac: document.getElementById('isLac'),
-  lacBlock: document.getElementById('lacBlock'),
-  litter: document.getElementById('litter'),
-  lacWeek: document.getElementById('lacWeek'),
-  errorAll: document.getElementById('errorAll'),
-  result: document.getElementById('resultBox')
-};
-
-function setBasePlaceholder(){
-  const cat = els.baseCat.value;
-  if(cat==='kitten_small'){
-    els.baseNum.placeholder = 'أدخل الأسابيع (٥–١٦)';
-  } else if(cat==='kitten_mid'){
-    els.baseNum.placeholder = 'أدخل الأشهر (٥–١٢)';
-  } else {
-    els.baseNum.placeholder = '';
-  }
-}
-
-function toggleBlocks(){
-  const cat = els.baseCat.value;
-  const adultMode = (cat==='adult' || cat==='spayed');
-  els.baseNumWrap.classList.toggle('hide', adultMode);
-  els.adultActWrap.classList.toggle('hide', !adultMode);
-  els.pregBlock.classList.toggle('hide', !els.isPreg.checked);
-  els.lacBlock.classList.toggle('hide', !els.isLac.checked);
-  if(adultMode){ els.baseNum.value=''; }
-  setBasePlaceholder();
-}
-
-function validateAll(){
-  let msgs = [];
-  const W = parseFloat(normalizeNumber(els.W.value));
-  if(!(W>0)) msgs.push('أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).');
-
-  const cat = els.baseCat.value;
-  if(cat==='kitten_small'){
-    const wk = parseInt(normalizeNumber(els.baseNum.value));
-    if(isNaN(wk) || wk<5 || wk>16) msgs.push('الأسابيع يجب أن تكون بين ٥ و ١٦.');
-  } else if(cat==='kitten_mid'){
-    const mo = parseInt(normalizeNumber(els.baseNum.value));
-    if(isNaN(mo) || mo<5 || mo>12) msgs.push('الأشهر يجب أن تكون بين ٥ و ١٢.');
-  }
-  els.errorAll.innerHTML = msgs.join('<br>');
-  els.errorAll.style.display = msgs.length? 'block':'none';
-  return {ok: msgs.length===0, W};
-}
-
 function computeOnce(){
   const v = validateAll();
   if(!v.ok){ render(0,0,false,0); return; }
 
   const W = v.W;
   const cat = els.baseCat.value;
-
   let A=1.0, P=1.0, L=1.0, Wprior=null, weeks=null, months=null;
-  if(cat==='kitten_small'){ weeks = parseInt(normalizeNumber(els.baseNum.value)); A = A_small[weeks] ?? 1.0; }
-  else if(cat==='kitten_mid'){ months = parseInt(normalizeNumber(els.baseNum.value)); A = A_mid[months] ?? 1.0; }
+
+  if(cat==='kitten_small'){ weeks = parseInt(els.baseNum.value); A = A_small[weeks] ?? 1.0; }
+  else if(cat==='kitten_mid'){ months = parseInt(els.baseNum.value); A = A_mid[months] ?? 1.0; }
   else if(cat==='adult'){ A = A_adult[els.adultAct.value] ?? 1.0; }
   else if(cat==='spayed'){ A = A_spayed[els.adultAct.value] ?? 1.0; }
+
+  if(els.sex.value!=='female'){ els.isPreg.checked=false; els.isLac.checked=false; }
 
   if(els.isPreg.checked){
     const pw = els.pregWeek.value;
@@ -263,7 +305,6 @@ function computeOnce(){
   let useFree = false, freeGrams = 0;
 
   if(ff){
-    // إصلاح: عدد الوجبات مع الأكل الحر = floor(C/(40W)) - 1 (حد أدنى 1)
     N = Math.max(1, Math.floor(C / baseMeal) - 1);
     const dC = C - N*baseMeal;
     freeGrams = dC > 0 ? dC / KCAL_PER_GRAM_DRY : 0;
@@ -283,7 +324,7 @@ function render(C,N,useFree,freeGrams){
       : '<div><span class="k">الأكل الحر:</span> بدون أكل حر</div>');
 }
 
-toggleBlocks();
+gateBySex();
 </script>
 </body>
 </html>
