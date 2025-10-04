@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>حاسبة سعرات القط 🐾 — V8</title>
+<title>حاسبة سعرات القط 🐾 — V9</title>
 <style>
   :root{--bg:#0b0e14;--card:#111623;--text:#eaf1ff;--muted:#98a2b3;--line:#1f2633;--danger:#ff6b6b;}
   *{box-sizing:border-box}
@@ -19,7 +19,6 @@
   .error{font-size:13px;background:rgba(255,107,107,.12);border:1px solid var(--danger);color:#ffc1c1;padding:10px 12px;border-radius:10px;margin:8px 0;display:none}
   .result{font-size:16px;line-height:1.9}
   .k{font-weight:700}
-  .hint{font-size:12px;color:var(--muted);margin-top:6px}
   .hide{display:none !important}
   button{cursor:pointer;margin-top:10px}
   button:active{transform:translateY(1px)}
@@ -102,7 +101,6 @@
     <div id="errorAll" class="error"></div>
 
     <button id="calcBtn" onclick="computeOnce()">احسب النتائج</button>
-    <div class="hint">الصيغة: 100×W^0.67×A×(P/((W/Wprior)^0.67))×L</div>
   </div>
 
   <div class="card">
@@ -115,35 +113,21 @@
 </div>
 
 <script>
-// تحويل الأرقام العربية للاتينية
 function normalizeNumber(s){
   if(s==null) return '';
   const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.',',':'.',' ':'','\u200f':''};
   return s.toString().split('').map(ch=>map[ch] ?? ch).join('');
 }
-
-// جهّز أسابيع الإرضاع 0..10
 (function(){
   const lacWeek = document.getElementById('lacWeek');
   for(let i=0;i<=10;i++){ const o=document.createElement('option'); o.value=String(i); o.textContent=(i===0?'افتراضي':'الأسبوع '+i); lacWeek.appendChild(o); }
 })();
 
-// == جداول معاملاتك من الصور ==
-
-// A للصغيرة (أسابيع)
 const A_small = {5:2.50,6:2.45,7:2.40,8:2.35,9:2.30,10:2.25,11:2.20,12:2.15,13:2.10,14:2.10,15:2.00,16:2.00};
-
-// A للمتوسطة (أشهر 5→12)
 const A_mid   = {5:1.95,6:1.90,7:1.85,8:1.80,9:1.75,10:1.50,11:1.50,12:1.50};
-
-// A للبالغة/المعقمة (حسب النشاط)
 const A_adult   = { low:0.90, med:1.00, high:1.10 };
 const A_spayed  = { low:0.75, med:0.85, high:0.95 };
-
-// P للحمل
 const P_preg = { '1-4':1.00, '5':1.10, '6':1.20, '7':1.30, '8':1.40, '9':1.45 };
-
-// L للرضاعة: ترتيب الأعمدة (يمين→يسار) = ≤2, 3–4, 5–6, ≥7
 const L_lac = {
   0:  { 'le2':1.0,  '3-4':1.0,  '5-6':1.0,  'ge7':1.0 },
   1:  { 'le2':1.6,  '3-4':1.8,  '5-6':2.0,  'ge7':2.2 },
@@ -158,24 +142,18 @@ const L_lac = {
   10: { 'le2':1.0,  '3-4':1.0,  '5-6':1.0,  'ge7':1.0 }
 };
 
-// قواعد الأكل الحر من الجداول
 function freeFoodAllowed(state){
-  // صغيرة
   if(state.cat==='kitten_small' && state.weeks) {
     if(state.weeks>=5 && state.weeks<=14) return true;
     if(state.weeks>=15) return false;
   }
-  // متوسطة
   if(state.cat==='kitten_mid') return false;
-  // بالغة/معقمة: مسموح فقط عند نشاط عالي
   if(state.cat==='adult'  && state.adultActivity==='high') return true;
   if(state.cat==='spayed' && state.adultActivity==='high') return true;
-  // حمل: مسموح من الأسبوع 6 فما فوق
   if(state.isPreg){
     const wk = state.pregWeek;
     if(wk==='6' || wk==='7' || wk==='8' || wk==='9') return true;
   }
-  // رضاعة: مسموح من 1 إلى 8
   if(state.isLac){
     const lw = parseInt(state.lacWeek||'0');
     if(lw>=1 && lw<=8) return true;
@@ -184,10 +162,8 @@ function freeFoodAllowed(state){
   return false;
 }
 
-// كثافة السعرات للدراي
 const KCAL_PER_GRAM_DRY = 4;
 
-// العناصر
 const els = {
   W: document.getElementById('wcur'),
   baseCat: document.getElementById('baseCategory'),
@@ -254,7 +230,6 @@ function computeOnce(){
   const W = v.W;
   const cat = els.baseCat.value;
 
-  // المعاملات
   let A=1.0, P=1.0, L=1.0, Wprior=null, weeks=null, months=null;
   if(cat==='kitten_small'){ weeks = parseInt(normalizeNumber(els.baseNum.value)); A = A_small[weeks] ?? 1.0; }
   else if(cat==='kitten_mid'){ months = parseInt(normalizeNumber(els.baseNum.value)); A = A_mid[months] ?? 1.0; }
@@ -276,7 +251,6 @@ function computeOnce(){
   const denom = (Wprior && Wprior>0) ? Math.pow(W/Wprior,0.67) : 1;
   const C = 100 * Math.pow(W,0.67) * A * (P/denom) * L;
 
-  // هل نطبّق الأكل الحر؟
   const ff = freeFoodAllowed({
     cat, weeks, months,
     adultActivity: els.adultAct.value,
@@ -289,7 +263,8 @@ function computeOnce(){
   let useFree = false, freeGrams = 0;
 
   if(ff){
-    N = Math.max(1, N - 1);
+    // إصلاح: عدد الوجبات مع الأكل الحر = floor(C/(40W)) - 1 (حد أدنى 1)
+    N = Math.max(1, Math.floor(C / baseMeal) - 1);
     const dC = C - N*baseMeal;
     freeGrams = dC > 0 ? dC / KCAL_PER_GRAM_DRY : 0;
     useFree = dC > 0;
@@ -300,7 +275,7 @@ function computeOnce(){
 
 function render(C,N,useFree,freeGrams){
   const fmt = (x)=> (x? Number(x).toLocaleString('ar-EG',{maximumFractionDigits:2}) : '0');
-  document.getElementById('resultBox').innerHTML =
+  els.result.innerHTML =
     '<div><span class="k">السعرات اليومية:</span> '+fmt(C)+' kcal</div>'+
     '<div><span class="k">عدد الوجبات:</span> '+(N||0)+'</div>'+
     (useFree
