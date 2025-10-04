@@ -377,14 +377,14 @@ function calc(){
   const perMeal = 40*w;
   let meals, freeText=i.freeNo;
   if(freeAllowed){
-    let n = Math.floor(calories / perMeal) - 1;
+    let n = Math.ceil(calories / perMeal) - 1;
     if(n < 1) n = 1;
     const deltaC = Math.max(0, calories - n*perMeal);
     const dry = Math.max(0, deltaC/4);
     freeText = I18N[LANG].freeYes(dry.toFixed(2));
     meals = n;
   }else{
-    let n = Math.floor(calories / perMeal);
+    let n = Math.ceil(calories / perMeal);
     if(n < 1) n = 1;
     meals = n;
     freeText = i.freeNo;
