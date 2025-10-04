@@ -267,6 +267,17 @@ function refreshBaseControls(){
   if(isMale){ isPreg.checked=false; isLac.checked=false; }
   isPreg.disabled=!pregAllowed; if(!pregAllowed) isPreg.checked=false;
   isLac.disabled=!lacAllowed;   if(!lacAllowed) isLac.checked=false;
+  // Hide/show lactating toggle explicitly per rules.
+  const isFemale = (sexSel.value === 'أنثى' || sexSel.value === 'Female' || sexSel.value === 'female');
+  const lacToggleEl = document.getElementById('lacToggle');
+  if (isFemale && c === 'kitten_small' && wk === 16) {
+    // Week 16 kittens: pregnancy only; no lactation toggle
+    lacAllowed = false;
+    if (lacToggleEl) lacToggleEl.classList.add('hide');
+  } else {
+    if (lacToggleEl) lacToggleEl.classList.toggle('hide', !lacAllowed);
+  }
+
 
   // blocks visibility
   pregBlock.classList.toggle('hide', !(isPreg.checked && pregAllowed));
