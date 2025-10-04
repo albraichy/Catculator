@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>حاسبة سعرات القط</title>
+<style>
+  :root{
+    --bg:#0d1620;
+    --panel:#121c28;
+    --muted:#9fb2c7;
+    --text:#e9f0f7;
+    --accent1:#8a5cff;
+    --accent2:#27d0e2;
+    --chip:#0f2336;
+    --dashed:#274057;
+  }
+  *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Tahoma,Arial}
+  body{margin:0;background:radial-gradient(1200px 600px at 90% -10%,rgba(73,178,255,.15),transparent 60%),
+                radial-gradient(900px 600px at -10% 0,rgba(171,118,255,.18),transparent 55%),var(--bg);color:var(--text)}
+  .wrap{max-width:760px;margin:auto;padding:16px}
+  header{display:flex;align-items:center;justify-content:center;gap:12px;margin:10px 0 14px}
+  header h1{margin:0;font-weight:800;letter-spacing:.6px}
+  .card{background:var(--panel);border-radius:16px;padding:16px;margin:14px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+  label{display:block;margin:8px 4px 6px;color:var(--muted);font-weight:600}
+  select,input[type="number"],.result{width:100%;padding:14px 16px;border-radius:12px;
+    border:1px solid rgba(255,255,255,.06);background:#0f1a26;color:var(--text);outline:none}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:640px){.row{grid-template-columns:1fr}}
+  .toggles{display:flex;gap:12px}
+  .toggle{flex:1;background:#0f1a26;border:1px dashed var(--dashed);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:10px}
+  .toggle input{inline-size:22px;block-size:22px}
+  .actions{display:flex;gap:12px;margin-top:10px}
+  .btn{flex:1;border:none;border-radius:14px;padding:14px 16px;font-weight:800;color:#00101a;background:linear-gradient(135deg,var(--accent1),var(--accent2));cursor:pointer}
+  .btn.ghost{background:#0f1a26;color:var(--text);border:1px solid rgba(255,255,255,.06)}
+  .results h2{margin-top:0}
+  .result{border:1px dashed var(--dashed);background:#0d1824}
+  .hide{display:none !important}
+  .hint{font-size:.9rem;color:#8aa0b8;margin:4px 2px 0}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header><h1>حاسبة سعرات القط</h1></header>
+
+    <div class="card">
+      <label>جنس القطة</label>
+      <select id="sex">
+        <option value="" selected disabled>—</option>
+        <option value="female">أنثى</option>
+        <option value="male">ذكر</option>
+      </select>
+    </div>
+
+    <div id="inputs" class="card hide">
+      <div class="row">
+        <div>
+          <label>الوزن الحالي (كجم)</label>
+          <input id="w" type="number" min="0" step="0.001" placeholder="مثال: 2.3">
+        </div>
+        <div>
+          <label>الفئة العمرية/الحالة الأساسية</label>
+          <select id="age">
+            <option value="" selected disabled>—</option>
+            <option value="kitten">صغيرة (٢–٤ أشهر)</option>
+            <option value="junior">متوسطة (٥–١٢ شهر)</option>
+            <option value="adult">بالغة (أكبر من سنة)</option>
+            <option value="spayed">معقمة</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="kittenWeekRow" class="row hide" style="margin-top:10px">
+        <div>
+          <label>الأسبوع</label>
+          <select id="week">
+            <option value="" selected disabled>—</option>
+            <option value="5">الأسبوع 5</option>
+            <option value="6">الأسبوع 6</option>
+            <option value="7">الأسبوع 7</option>
+            <option value="8">الأسبوع 8</option>
+            <option value="9">الأسبوع 9</option>
+            <option value="10">الأسبوع 10</option>
+            <option value="11">الأسبوع 11</option>
+            <option value="12">الأسبوع 12</option>
+            <option value="13">الأسبوع 13</option>
+            <option value="14">الأسبوع 14</option>
+            <option value="15">الأسبوع 15</option>
+            <option value="16">الأسبوع 16</option>
+          </select>
+        </div>
+        <div></div>
+      </div>
+
+      <div id="reproRow" class="toggles hide" style="margin-top:10px">
+        <label class="hide" id="reproLabel">الحالة الإنجابية</label>
+        <div class="toggle"><input id="preg" type="checkbox"><span>حامل</span></div>
+        <div class="toggle" id="lactToggle"><input id="lact" type="checkbox"><span>مرضعـة</span></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="calc">احسب النتائج</button>
+        <button class="btn ghost" id="reset">إعادة ضبط</button>
+      </div>
+    </div>
+
+    <div id="results" class="card results hide">
+      <h2>النتائج</h2>
+      <label>السعرات اليومية</label>
+      <div id="calOut" class="result">kcal 0</div>
+      <label>عدد الوجبات</label>
+      <div id="mealsOut" class="result">0</div>
+      <label>الأكل الحر</label>
+      <div id="freeOut" class="result">—</div>
+      <div class="hint">* الحسابات تجريبية هنا — الملف هدفه إصلاح إظهار/إخفاء الخيارات فقط.</div>
+    </div>
+
+  </div>
+
+<script>
+  const sex = document.getElementById('sex');
+  const age = document.getElementById('age');
+  const week = document.getElementById('week');
+  const w = document.getElementById('w');
+  const preg = document.getElementById('preg');
+  const lact = document.getElementById('lact');
+  const lactToggle = document.getElementById('lactToggle');
+  const reproRow = document.getElementById('reproRow');
+  const reproLabel = document.getElementById('reproLabel');
+  const kittenWeekRow = document.getElementById('kittenWeekRow');
+  const inputs = document.getElementById('inputs');
+  const results = document.getElementById('results');
+
+  function show(el){ el.classList.remove('hide'); }
+  function hide(el){ el.classList.add('hide'); }
+
+  function refreshVisibility(){
+    // Inputs appear after sex selection
+    if(!sex.value){ hide(inputs); hide(results); return; }
+    show(inputs);
+
+    // Default: no repro options visible
+    hide(reproRow); hide(lactToggle); lact.checked=false; preg.checked=false;
+    hide(kittenWeekRow);
+
+    const isFemale = sex.value === 'female';
+    const isKitten = age.value === 'kitten';
+
+    // Week picker only for kittens
+    if(isKitten){ show(kittenWeekRow); }
+
+    // Repro logic
+    if(isFemale){
+      // Female: decide what to show
+      if(isKitten){
+        const wk = parseInt(week.value||'0',10);
+        if(wk>=16){ // Week 16 exactly / or more: pregnancy allowed, lactation hidden
+          show(reproRow); reproLabel.classList.remove('hide');
+          lact.checked=false; hide(lactToggle); // hide lactating at 16
+          // allow pregnancy toggle to appear
+        }else{
+          // <16: both hidden
+          hide(reproRow);
+        }
+      }else{
+        // Non-kitten female (junior/adult/spayed): show both toggles
+        show(reproRow); reproLabel.classList.remove('hide');
+        show(lactToggle);
+      }
+    }else{
+      // Male: never show
+      hide(reproRow);
+    }
+  }
+
+  sex.addEventListener('change', ()=>{ refreshVisibility(); });
+  age.addEventListener('change', ()=>{ refreshVisibility(); });
+  week.addEventListener('change', ()=>{ refreshVisibility(); });
+
+  document.getElementById('reset').addEventListener('click', ()=>{
+    sex.value='';
+    age.value='';
+    week.value='';
+    w.value='';
+    preg.checked=false; lact.checked=false;
+    hide(inputs); hide(results);
+  });
+
+  document.getElementById('calc').addEventListener('click', ()=>{
+    show(results);
+    // Placeholder math
+    const weight = parseFloat(w.value||'0');
+    const base = Math.max(0, Math.round( (100 * Math.pow(weight,0.67)) ));
+    document.getElementById('calOut').textContent = 'kcal ' + base.toFixed(0);
+    document.getElementById('mealsOut').textContent = (weight>0?4:0);
+    document.getElementById('freeOut').textContent = '—';
+  });
+
+  // initial
+  refreshVisibility();
+</script>
+</body>
+</html>
