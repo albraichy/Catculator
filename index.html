@@ -312,7 +312,7 @@ button:not(.secondary){background:linear-gradient(135deg,var(--accent),var(--acc
 
 /* === Disclaimer style === */
 #disclaimer{
-  font-size:12px;
+  font-size:11px;
   color:var(--muted);
   text-align:center;
   padding:12px 18px calc(12px + env(safe-area-inset-bottom));
@@ -324,6 +324,10 @@ button:not(.secondary){background:linear-gradient(135deg,var(--accent),var(--acc
 
 /* Balanced spacing for action buttons */
 .cta{margin:16px 0; gap:10px}
+
+
+/* Balanced CTA spacing above/below and center alignment */
+.card .cta{margin-top:18px; margin-bottom:18px; justify-content:center; gap:12px}
 
 </style>
 </head>
@@ -435,7 +439,9 @@ const I18N = {
     pregWeek:"أسبوع الحمل", litter:"عدد الصغار", lacWeek:"أسبوع الإرضاع",
     calc:"احسب النتائج", reset:"إعادة ضبط",
     daily:"السعرات اليومية", meals:"عدد الوجبات", perMeal:"السعرات بالوجبة", free:"الأكل الحر",
-    freeYes:(g)=>`مع أكل حر — المطلوب تقريباً ${g} غ`, freeNo:"بدون أكل حر",
+    freeYes:(g)=>`مع أكل حر — المطلوب تقريباً ${g,
+    disclaimer:"⚠️ <b>تنويه</b>: تم تصميم وتطوير المعادلة المستخدمة في هذه الحاسبة بشكل خاص من قِبل مطوّر الموقع، بعد دراسة وتحليل عدد من المصادر والدراسات الطبية البيطرية الحديثة، دون الاعتماد على المعادلات العامة أو الأساليب الشائعة. تهدف القيم الناتجة إلى تقديم أدق التقديرات التقريبية للمساعدة فقط، ولا تُعد بديلاً عن استشارة الطبيب البيطري المختص."
+} غ`, freeNo:"بدون أكل حر",
     errW:"أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).",
     errWeeks:"الأسابيع يجب أن تكون بين ٥ و ١٦.", errMonths:"الأشهر يجب أن تكون بين ٥ و ١٢.",
     errPreW:"الوزن قبل الحمل مطلوب عند اختيار (حامل).",
@@ -458,7 +464,9 @@ const I18N = {
     pregWeek:"Pregnancy Week", litter:"Kitten Count", lacWeek:"Lactation Week",
     calc:"Calculate", reset:"Reset",
     daily:"Daily Calories", meals:"Meals per Day", perMeal:"kcal per Meal", free:"Free‑feeding",
-    freeYes:(g)=>`Allowed — dry food ≈ ${g} g`, freeNo:"Not allowed",
+    freeYes:(g)=>`Allowed — dry food ≈ ${g,
+    disclaimer:"⚠️ <b>Disclaimer</b>: The formula used in this calculator was uniquely designed and developed by the website’s creator after reviewing and analyzing various modern veterinary medical sources and studies, without relying on general formulas or commonly used methods. The calculated values aim to provide the most accurate approximate estimates for assistance purposes only and do not replace professional veterinary advice."
+} g`, freeNo:"Not allowed",
     errW:"Enter a valid weight (> 0).",
     errWeeks:"Weeks must be between 5 and 16.", errMonths:"Months must be between 5 and 12.",
     errPreW:"Pre‑pregnancy weight is required when 'Pregnant' is selected.",
@@ -715,6 +723,14 @@ function resetAll(){
 }
 
 /* ---------- wire events & init ---------- */
+
+try{
+  const btnAr=document.getElementById('btnAr');
+  const btnEn=document.getElementById('btnEn');
+  if(btnAr) btnAr.addEventListener('click', ()=>setTimeout(updateDisclaimer, 0));
+  if(btnEn) btnEn.addEventListener('click', ()=>setTimeout(updateDisclaimer, 0));
+}catch(e){}
+
 document.getElementById('btnAR').addEventListener('click', ()=>setLang('ar'));
 document.getElementById('btnEN').addEventListener('click', ()=>setLang('en'));
 sex.addEventListener('change', onSexChange);
@@ -737,7 +753,7 @@ function init(){
   calcGrid.classList.add('hide');
   resultsCard.classList.add('hide'); // ensure hidden at start
   rebuildUITexts();
-updateDisclaimer(); }
+updateDisclaimer(); updateDisclaimer(); }
 init();
 
 // Ensure disclaimer follows current language
