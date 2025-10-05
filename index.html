@@ -250,6 +250,26 @@ input,select{background:var(--field);}
 /* Prevent margin collapse at page end */
 main > :last-child{margin-bottom:0}
 
+
+/* === Footer structure fix & light-mode completeness (v4) === */
+
+/* Body is flex; make <main> also flex column so footer inside it can push to bottom */
+main{flex:1 0 auto; display:flex; flex-direction:column}
+
+/* Footer inside <main> sticks to the bottom of main */
+footer#copyright{margin-top:auto}
+
+/* Normalize component surfaces to use tokens (works in both themes) */
+.toggle{background:var(--field); border:1px dashed var(--line)}
+.lang{border-color:var(--line)}
+.lang button{color:var(--muted)}
+input,select{background:var(--field); color:var(--text); border-color:var(--line)}
+.card{background:linear-gradient(180deg, rgba(255,255,255,.02), transparent 30%), var(--card); border-color:var(--line)}
+.error{background:rgba(229,72,77,.12); border:1px solid rgba(229,72,77,.35); color:inherit}
+
+/* Ensure color-scheme hints for form controls */
+:root{color-scheme: light dark}
+
 </style>
 </head>
 <body>
