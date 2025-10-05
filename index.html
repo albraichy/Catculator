@@ -90,6 +90,63 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0
 #calcBtn{order:1}
 #resetBtn{order:2}
 
+
+/* ===== Layout & Theme polish (final pass) ===== */
+
+/* Fill the full safe viewport height; put background on <html> to avoid iOS gaps */
+html{min-height:100svh;background:
+  radial-gradient(900px 600px at 110% -10%, rgba(76,111,191,.10), transparent 50%),
+  radial-gradient(700px 500px at -10% 110%, rgba(23,37,84,.12), transparent 55%),
+  linear-gradient(180deg, #0a1530 0%, #0b1838 50%, #0a1226 100%);
+}
+
+/* Use flex column so footer sits at the bottom even with little content */
+body{min-height:100svh;display:flex;flex-direction:column;background:transparent}
+
+/* Main grows to push footer down */
+main{flex:1}
+
+/* Footer pinned to bottom naturally; add safe-area padding for iOS */
+footer#copyright{
+  margin-top:auto;
+  padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+  text-align:center;
+  color:#9fb0c7;
+  border-top:1px solid rgba(255,255,255,.05);
+  background:linear-gradient(180deg, rgba(10,21,48,.65), rgba(10,21,48,.85));
+  backdrop-filter:saturate(140%) blur(6px);
+}
+
+/* Tidy header background to match the new theme */
+header{background:linear-gradient(180deg, rgba(10,21,48,.92), rgba(10,21,48,.65));border-bottom:1px solid rgba(255,255,255,.06)}
+
+/* Minimalist blue palette via CSS variables */
+:root{
+  --bg:#0b1838; --bg2:#0a1226; --card:#0e1a39; --line:#1c274a;
+  --text:#eaf1ff; --muted:#9fb0c7; --accent:#4cc9f0; --accent2:#7c2ae8;
+  --danger:#ff6b6b; --ok:#2dd4bf; --radius:16px;
+}
+
+/* Light mode palette (auto reacts to system theme) */
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#f3f6fc; --bg2:#e9eef8; --card:#ffffff; --line:#d7e0f0;
+    --text:#0b1220; --muted:#385076; --accent:#4660e6; --accent2:#9c42ff;
+    --danger:#e5484d; --ok:#12a594;
+  }
+  html{background:
+    radial-gradient(900px 600px at 110% -10%, rgba(70,96,230,.10), transparent 55%),
+    linear-gradient(180deg, #f5f8ff 0%, #eef3ff 100%);}
+  footer#copyright{background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.95)); border-top:1px solid var(--line); color:#2a3b59}
+}
+
+/* Cards pick up the new variables (keep subtle glass) */
+.card{background:linear-gradient(180deg, rgba(255,255,255,.02), transparent 30%), var(--card);
+  border:1px solid var(--line)}
+
+/* Ensure no stray page gaps on very tall viewports */
+#app, main{background:transparent}
+
 </style>
 </head>
 <body>
