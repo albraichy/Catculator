@@ -147,6 +147,62 @@ header{background:linear-gradient(180deg, rgba(10,21,48,.92), rgba(10,21,48,.65)
 /* Ensure no stray page gaps on very tall viewports */
 #app, main{background:transparent}
 
+
+/* === Final polish v2 === */
+
+/* Cover viewport reliably on iOS/Android (dynamic toolbars) */
+html, body{min-height:100dvh}
+html{background:none}
+body{
+  /* Put background on body to avoid iOS white gaps */
+  background:
+    radial-gradient(900px 600px at 110% -10%, rgba(76,111,191,.10), transparent 50%),
+    radial-gradient(700px 500px at -10% 110%, rgba(23,37,84,.12), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  display:flex; flex-direction:column;
+}
+
+/* Main expands so footer sits at the very bottom when content is short */
+main{flex:1; display:block}
+
+/* Footer stays at page bottom; never floats under content */
+footer#copyright{
+  margin-top:auto;
+  position:relative;
+}
+
+/* Safer color tokens inc. dedicated field surfaces */
+:root{
+  --bg:#0b1838; --bg2:#0a1226; --card:#0e1a39; --field:#0b1324; --line:#1c274a;
+  --text:#eaf1ff; --muted:#9fb0c7; --accent:#4cc9f0; --accent2:#7c2ae8;
+  --danger:#ff6b6b; --ok:#2dd4bf; --radius:16px;
+}
+
+/* Inputs pull from --field so they adapt in light mode */
+input,select{background:var(--field);border:1px solid var(--line);color:var(--text)}
+
+/* Light theme re-map for clean minimalist look */
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#eef3ff; --bg2:#e6ebfb; --card:#ffffff; --field:#f5f7ff; --line:#d7e0f0;
+    --text:#0b1220; --muted:#43567a; --accent:#4660e6; --accent2:#9c42ff;
+    --danger:#e5484d; --ok:#12a594;
+  }
+  body{
+    background:
+      radial-gradient(900px 600px at 110% -10%, rgba(70,96,230,.10), transparent 55%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  }
+  header{background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.75)); border-bottom:1px solid var(--line)}
+  .card{background:linear-gradient(180deg, rgba(70,96,230,.03), transparent 30%), var(--card);}
+  label{color:#5a6a86}
+  .secondary{background:var(--field); border:1px solid var(--line); color:var(--text)}
+  footer#copyright{background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.98)); border-top:1px solid var(--line); color:#2a3b59}
+}
+
+/* Remove accidental page bottoms caused by margins collapsing */
+main > *:last-child{margin-bottom:0}
+
 </style>
 </head>
 <body>
