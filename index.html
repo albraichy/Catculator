@@ -321,6 +321,10 @@ button:not(.secondary){background:linear-gradient(135deg,var(--accent),var(--acc
   margin:0 auto;
 }
 
+
+/* Balanced spacing for action buttons */
+.cta{margin:16px 0; gap:10px}
+
 </style>
 </head>
 <body>
@@ -406,11 +410,12 @@ button:not(.secondary){background:linear-gradient(135deg,var(--accent),var(--acc
 
   </div>
 
-  <footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
-
-<div id="disclaimer">
+  <div id="disclaimer">
 ⚠️ تنويه: تم تصميم وتطوير المعادلة المستخدمة في هذه الحاسبة بشكل خاص من قِبل مطوّر الموقع، بعد دراسة وتحليل عدد من المصادر والدراسات الطبية البيطرية الحديثة، دون الاعتماد على المعادلات العامة أو الأساليب الشائعة. تهدف القيم الناتجة إلى تقديم أدق التقديرات التقريبية للمساعدة فقط، ولا تُعد بديلاً عن استشارة الطبيب البيطري المختص.
 </div>
+<footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
+
+
 
 </main>
 
@@ -556,6 +561,16 @@ function refreshBaseControls(){
   pregBlock.classList.toggle('hide', !(isPreg.checked && pregAllowed));
   lacBlock.classList.toggle('hide',  !(isLac.checked && lacAllowed));
 }
+
+function updateDisclaimer(){
+  try{
+    const d = document.getElementById("disclaimer");
+    if(!d) return;
+    const i = I18N[LANG];
+    if(i && i.disclaimer){ d.innerHTML = i.disclaimer; }
+  }catch(e){}
+}
+
 function rebuildUITexts(){
   const i=I18N[LANG];
   document.documentElement.lang=LANG; document.documentElement.dir=i.dir;
@@ -722,7 +737,7 @@ function init(){
   calcGrid.classList.add('hide');
   resultsCard.classList.add('hide'); // ensure hidden at start
   rebuildUITexts();
-}
+updateDisclaimer(); }
 init();
 
 // Ensure disclaimer follows current language
