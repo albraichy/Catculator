@@ -62,16 +62,10 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0
   .mini-value{font-size:20px}
 }
 
-/* 👇 Font size tweaks */
-.section-title {
-  font-size: 0.9em !important;
-}
-#resultsCard .mini-label {
-  font-size: 13px !important;
-}
-#resultsCard .mini-value {
-  font-size: 11px !important;
-}
+/* === overrides: titles smaller by 1 step; result values bigger by 1 step === */
+.section-title{font-size:0.9em !important;}
+#resultsCard .mini-value{font-size:12px !important;}
+/* keep labels as is from last tweak (13px) */
 
 </style>
 </head>
@@ -176,7 +170,7 @@ const I18N = {
     preW:"الوزن قبل الحمل (كجم)", preWph:"مثال: ٣٫٨",
     pregWeek:"أسبوع الحمل", litter:"عدد الصغار", lacWeek:"أسبوع الإرضاع",
     calc:"احسب النتائج", reset:"إعادة ضبط",
-    daily:"السعرات اليومية", meals:"عدد الوجبات", perMeal:"السعرات لكل وجبة", free:"الأكل الحر",
+    daily:"السعرات اليومية", meals:"عدد الوجبات", perMeal:"السعرات بالوجبة", free:"الأكل الحر",
     freeYes:(g)=>`مع أكل حر — المطلوب تقريباً ${g} غ`, freeNo:"بدون أكل حر",
     errW:"أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).",
     errWeeks:"الأسابيع يجب أن تكون بين ٥ و ١٦.", errMonths:"الأشهر يجب أن تكون بين ٥ و ١٢.",
@@ -409,7 +403,7 @@ function calc(){
     if(n < 1) n = 1;
     const deltaC = Math.max(0, calories - n*perMeal);
     const dry = Math.max(0, deltaC/4);
-    freeText = dry.toFixed(2) + ' غ';
+    freeText = (LANG==='en' ? (dry.toFixed(2) + ' g') : (dry.toFixed(2) + ' غ'));
     meals = n;
   }else{
     // IMPORTANT FIX: when free‑feeding is NOT allowed, use CEIL for number of meals
@@ -423,6 +417,16 @@ function calc(){
   r2v.textContent = String(meals);
   r4v.textContent = perMeal.toFixed(2) + ' kcal';
   r3v.textContent = freeText;
+  
+try{
+  if (typeof LANG!=='undefined' && LANG==='en') {
+    var fv = document.getElementById('r3v');
+    if (fv && /\d/.test(fv.textContent || '')) {
+      fv.textContent = fv.textContent.replace('غ','g');
+    }
+  }
+}catch(e){};
+
   resultsCard.classList.remove('hide');
 }
 
