@@ -437,8 +437,9 @@ const I18N = {
     copyright:"© Albraichy 2025 — جميع الحقوق محفوظة",
     week:(n)=>`الأسبوع ${n}`, month:(n)=>`الشهر ${n}`,
     kittenCounts:[["le2","≤٢"],["3-4","٣–٤"],["5-6","٥–٦"],["ge7","≥٧"]],
-    pregWeeks:[["1-4","١–٤"],["5","٥"],["6","٦"],["7","٧"],["8","٨"],["9","٩"]],
-  },
+    pregWeeks:[["1-4","١–٤"],["5","٥"],["6","٦"],["7","٧"],["8","٨"],["9","٩"]],,
+    disclaimer:"⚠️ <b>تنويه</b>: تم تصميم وتطوير المعادلة المستخدمة في هذه الحاسبة بشكل خاص من قِبل مطوّر الموقع، بعد دراسة وتحليل عدد من المصادر والدراسات الطبية البيطرية الحديثة، دون الاعتماد على المعادلات العامة أو الأساليب الشائعة. تهدف القيم الناتجة إلى تقديم أدق التقديرات التقريبية للمساعدة فقط، ولا تُعد بديلاً عن استشارة الطبيب البيطري المختص."
+},
   en:{
     dir:"ltr", appTitle:"Cat Calorie Calculator", gateTitle:"Choose sex to continue", sex:"Cat’s Sex",
     sexOptions:[["","— Select —"],["male","Male"],["female","Female"]],
@@ -459,8 +460,9 @@ const I18N = {
     copyright:"© Albraichy 2025 — All rights reserved",
     week:(n)=>`Week ${n}`, month:(n)=>`Month ${n}`,
     kittenCounts:[["le2","≤2"],["3-4","3–4"],["5-6","5–6"],["ge7","≥7"]],
-    pregWeeks:[["1-4","1–4"],["5","5"],["6","6"],["7","7"],["8","8"],["9","9"]],
-  }
+    pregWeeks:[["1-4","1–4"],["5","5"],["6","6"],["7","7"],["8","8"],["9","9"]],,
+    disclaimer:"⚠️ <b>Disclaimer</b>: The formula used in this calculator was uniquely designed and developed by the website’s creator after reviewing and analyzing various modern veterinary medical sources and studies, without relying on general formulas or commonly used methods. The calculated values aim to provide the most accurate approximate estimates for assistance purposes only and do not replace professional veterinary advice."
+}
 };
 let LANG='ar';
 const $ = (id)=>document.getElementById(id);
@@ -716,6 +718,22 @@ function init(){
   rebuildUITexts();
 }
 init();
+
+// Ensure disclaimer follows current language
+(function(){
+  function setDisclaimer(){
+    try{
+      const d=document.getElementById("disclaimer");
+      if(!d) return;
+      const lang = document.documentElement.lang === 'en' ? 'en' : 'ar';
+      if(I18N && I18N[lang] && I18N[lang].disclaimer){ d.innerHTML = I18N[lang].disclaimer; }
+    }catch(e){}
+  }
+  setDisclaimer();
+  // observe language changes if code toggles dir/lang
+  const mo = new MutationObserver(setDisclaimer);
+  mo.observe(document.documentElement, {attributes:true, attributeFilter:['lang','dir']});
+})();
 </script>
 </body>
 </html>
