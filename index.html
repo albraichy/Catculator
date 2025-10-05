@@ -437,8 +437,7 @@ const I18N = {
     copyright:"© Albraichy 2025 — جميع الحقوق محفوظة",
     week:(n)=>`الأسبوع ${n}`, month:(n)=>`الشهر ${n}`,
     kittenCounts:[["le2","≤٢"],["3-4","٣–٤"],["5-6","٥–٦"],["ge7","≥٧"]],
-    pregWeeks:[["1-4","١–٤"],["5","٥"],["6","٦"],["7","٧"],["8","٨"],["9","٩"]],
-  ,
+    pregWeeks:[["1-4","١–٤"],["5","٥"],["6","٦"],["7","٧"],["8","٨"],["9","٩"]], 
     disclaimer:"⚠️ <b>تنويه</b>: تم تصميم وتطوير المعادلة المستخدمة في هذه الحاسبة بشكل خاص من قِبل مطوّر الموقع، بعد دراسة وتحليل عدد من المصادر والدراسات الطبية البيطرية الحديثة، دون الاعتماد على المعادلات العامة أو الأساليب الشائعة. تهدف القيم الناتجة إلى تقديم أدق التقديرات التقريبية للمساعدة فقط، ولا تُعد بديلاً عن استشارة الطبيب البيطري المختص."
 },
   en:{
@@ -713,6 +712,11 @@ calcBtn.addEventListener('click', calc);
 resetBtn.addEventListener('click', resetAll);
 
 function init(){
+  // sync LANG with document attribute (if present)
+  try{
+    const docLang = document.documentElement.lang;
+    if(docLang==='en' || docLang==='ar'){ LANG = docLang; }
+  }catch(e){}
   // start AR, hidden calc grid, and empty sex
   setSelectOptions(sex, I18N[LANG].sexOptions);
   calcGrid.classList.add('hide');
