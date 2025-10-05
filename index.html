@@ -473,8 +473,6 @@ function setSelectOptions(sel, arr, keepValue=null){
   sel.innerHTML='';
   arr.forEach(([v,txt])=>{const o=document.createElement('option');o.value=v;o.textContent=txt;sel.appendChild(o);});
   if(val && [...sel.options].some(o=>o.value===val)) sel.value = val;
-});
-  if(val && [...sel.options].some(o=>o.value===val)) sel.value = val;
 }
 function toASCII(s){
   if(!s) return '';
