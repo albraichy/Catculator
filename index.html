@@ -53,14 +53,10 @@ button.secondary{background:#0b1324;color:var(--text);border:1px solid #22304f}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0c7;text-align:center;font-size:13px}
 .small{font-size:12px}
 
-/* compact results grid */
-.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.mini{border:1px dashed var(--line);border-radius:16px;padding:18px 14px;text-align:center}
-.mini-label{font-weight:700;margin-bottom:8px}
-.mini-value{font-size:18px}
-@media (min-width:700px){
-  .mini-value{font-size:20px}
-}
+/* === tweak: smaller results typography (2 steps down) === */
+#resultsCard .mini-label{font-size:14px !important; white-space:nowrap;}
+#resultsCard .mini-value{font-size:12px !important;}
+
 </style>
 </head>
 <body>
@@ -132,18 +128,13 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0
       </div>
     </section>
 
-   
-<section class="card hide" id="resultsCard">
-  <h2 class="section-title" id="secResults">النتائج</h2>
-  <div class="result-grid" id="resultGrid">
-    <div class="mini"><div class="mini-label" id="r1k">السعرات اليومية</div><div class="mini-value" id="r1v">0 kcal</div></div>
-    <div class="mini"><div class="mini-label" id="r2k">عدد الوجبات</div><div class="mini-value" id="r2v">0</div></div>
-    <div class="mini"><div class="mini-label" id="r4k">السعرات في كل وجبة</div><div class="mini-value" id="r4v">0</div></div>
-    <div class="mini"><div class="mini-label" id="r3k">الأكل الحر</div><div class="mini-value" id="r3v">—</div></div>
-  </div>
-  <div class="small" id="note" class="hide"></div>
-</section>
-
+    <section class="card hide" id="resultsCard">
+      <h2 class="section-title" id="secResults">النتائج</h2>
+      <div class="stat"><div class="k" id="r1k">السعرات اليومية</div><div id="r1v">0 kcal</div></div>
+      <div class="stat"><div class="k" id="r2k">عدد الوجبات</div><div id="r2v">0</div></div>
+      <div class="stat"><div class="k" id="r3k">الأكل الحر</div><div id="r3v">—</div></div>
+      <div class="small" id="note" class="hide"></div>
+    </section>
   </div>
 
   <footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
@@ -397,19 +388,18 @@ function calc(){
     if(n < 1) n = 1;
     const deltaC = Math.max(0, calories - n*perMeal);
     const dry = Math.max(0, deltaC/4);
-    freeText = dry.toFixed(2) + ' غ';
+    freeText = I18N[LANG].freeYes(dry.toFixed(2));
     meals = n;
   }else{
     // IMPORTANT FIX: when free‑feeding is NOT allowed, use CEIL for number of meals
     let n = Math.ceil(calories / perMeal);
     if(n < 1) n = 1;
     meals = n;
-    freeText = '🚫';
+    freeText = i.freeNo;
   }
 
   r1v.textContent = calories.toFixed(2) + ' kcal';
   r2v.textContent = String(meals);
-  r4v.textContent = perMeal.toFixed(2) + ' kcal';
   r3v.textContent = freeText;
   resultsCard.classList.remove('hide');
 }
