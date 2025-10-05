@@ -203,6 +203,53 @@ input,select{background:var(--field);border:1px solid var(--line);color:var(--te
 /* Remove accidental page bottoms caused by margins collapsing */
 main > *:last-child{margin-bottom:0}
 
+
+/* === Cross‑browser fill + sticky footer — v3 === */
+
+/* Fill viewport on iOS Safari (safe-area + dynamic bars) */
+html, body {height:100%; min-height:100svh;}
+/* Solid base color behind gradients to kill white gaps */
+html{background-color: var(--bg);}
+body{
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(900px 600px at 110% -10%, rgba(76,111,191,.10), transparent 50%),
+    radial-gradient(700px 500px at -10% 110%, rgba(23,37,84,.12), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  background-repeat:no-repeat;
+  background-size:cover;
+  display:flex; flex-direction:column;
+  padding-bottom: env(safe-area-inset-bottom);
+  margin:0;
+}
+
+/* Header safe-area to avoid top white strip on iOS */
+header{padding-top: max(0px, env(safe-area-inset-top));}
+
+/* Main stretches to push footer down */
+main{flex:1 0 auto}
+
+/* Footer anchored at bottom */
+footer#copyright{margin-top:auto}
+
+/* Light theme also sets solid base color to avoid white bands */
+@media (prefers-color-scheme: light){
+  html{background-color: var(--bg)}
+  body{
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(900px 600px at 110% -10%, rgba(70,96,230,.10), transparent 55%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  }
+  input::placeholder{color:#7b89a6}
+}
+
+/* Inputs use field color in both modes */
+input,select{background:var(--field);}
+
+/* Prevent margin collapse at page end */
+main > :last-child{margin-bottom:0}
+
 </style>
 </head>
 <body>
