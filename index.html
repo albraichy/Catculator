@@ -69,6 +69,27 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0
 
 
 #secGateTitle, #secResults{display:none !important;}
+
+/* --- User tweaks (Feb 2025) --- */
+/* Keep paired fields side-by-side even on mobile */
+@media(max-width:600px){
+  .row{grid-template-columns:1fr 1fr !important;}
+}
+
+/* Center the CTA buttons and bump font size one step */
+.cta{justify-content:center;align-items:center}
+.cta button{font-size:16px}
+
+/* Also center if buttons wrap */
+.cta{text-align:center}
+
+/* Ensure buttons not stretched oddly */
+.cta button{min-width:140px}
+
+/* Just to be sure: place the two buttons next to each other nicely */
+#calcBtn{order:1}
+#resetBtn{order:2}
+
 </style>
 </head>
 <body>
