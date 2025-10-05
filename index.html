@@ -52,6 +52,30 @@ button.secondary{background:#0b1324;color:var(--text);border:1px solid #22304f}
 .hide{display:none !important}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0c7;text-align:center;font-size:13px}
 .small{font-size:12px}
+
+/* --- injected: results grid KPIs (non-destructive) --- */
+.results-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.kpi{
+  border:1px dashed var(--line);
+  border-radius:16px;
+  padding:16px;
+}
+.kpi-label{
+  font-weight:700;
+  margin-bottom:6px;
+}
+.kpi-value{
+  font-size:18px;
+  line-height:1.6;
+}
+@media (max-width:480px){
+  .results-grid{ grid-template-columns:1fr 1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -133,6 +157,30 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0
   </div>
 
   <footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
+
+<!-- injected: compact KPI results card -->
+<section class="card" id="resultsKPI">
+  <h2 class="section-title">النتائج (تنسيق مضغوط)</h2>
+  <div class="results-grid">
+    <div class="kpi">
+      <div class="kpi-label">السعرات اليومية</div>
+      <div class="kpi-value" id="resCalories">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">عدد الوجبات</div>
+      <div class="kpi-value" id="resMeals">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">السعرات في كل وجبة</div>
+      <div class="kpi-value" id="resMealCal">—</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">الأكل الحر</div>
+      <div class="kpi-value" id="resFree">—</div>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <script>
@@ -427,5 +475,121 @@ function init(){
 }
 init();
 </script>
+
+<!-- injected script: mirror existing results into KPI grid without touching core logic -->
+<script>
+(function(){
+  function num(v){
+    // extract first float from string
+    var m = String(v || '').replace(',', '.').match(/-?\d+(?:[\.,]\d+)?/);
+    return m ? parseFloat(m[0].replace(',', '.')) : NaN;
+  }
+
+  function updateKPIs(){
+    // Try to find existing result elements by common patterns
+    var text = document.body.innerText;
+
+    // Daily calories: look for number followed by 'kcal' in the first results card rows
+    var dailyEl = document.querySelector('#resultsCard .row, #resultsCard [data-role="daily"], .result, .results-card');
+    // Fallback: read from visible labeled cell
+    var dailyValueNode = document.querySelector('#resultsCard .row:nth-of-type(1) .value, #resultsCard .row:nth-of-type(1) div:last-child, .result .calories');
+    var daily = NaN;
+
+    // Conservative: search for 'kcal' occurrences near 'السعرات اليومية' cell
+    var labelCell = Array.from(document.querySelectorAll('.card .row, .card div, .card li')).find(function(n){
+      return /السعرات اليومية|Daily Calories/i.test(n.textContent || '');
+    });
+    if(labelCell){
+      // The sibling/parent may contain the number
+      var scope = labelCell.parentElement || document;
+      var kcNode = Array.from(scope.querySelectorAll('*')).find(function(n){
+        return /kcal/i.test(n.textContent || '');
+      });
+      if(kcNode){
+        daily = num(kcNode.textContent);
+      }
+    }
+    if(!isFinite(daily)){
+      // global search
+      var m = document.body.innerText.match(/(\d+[\.,]?\d*)\s*kcal/i);
+      if(m){ daily = num(m[0]); }
+    }
+
+    // Meals per day
+    var meals = NaN;
+    var mealsLabel = Array.from(document.querySelectorAll('.card .row, .card div, .card li')).find(function(n){
+      return /عدد الوجبات|Meals per Day/i.test(n.textContent || '');
+    });
+    if(mealsLabel){
+      // find a digit in the same row or the next
+      var row = mealsLabel.closest('.row') || mealsLabel.parentElement;
+      var numberNode = row && Array.from(row.querySelectorAll('*')).find(function(n){
+        return /^\s*\d+\s*$/.test(n.textContent || '');
+      });
+      if(numberNode){ meals = parseInt(numberNode.textContent,10); }
+    }
+    if(!isFinite(meals)){
+      // heuristic: find a standalone integer near 'عدد الوجبات'
+      var all = document.body.innerText.split(/\n+/);
+      for(var i=0;i<all.length;i++){
+        if(/عدد الوجبات|Meals per Day/i.test(all[i])){
+          var nline = all[i+1] || '';
+          var mm = nline.match(/\d+/);
+          if(mm){ meals = parseInt(mm[0],10); break; }
+        }
+      }
+    }
+
+    // Free feeding: if text includes 'بدون أكل حر' -> not allowed
+    var freeText = '';
+    var freeLabel = Array.from(document.querySelectorAll('.card .row, .card div, .card li')).find(function(n){
+      return /الأكل الحر|Free-?feeding/i.test(n.textContent || '');
+    });
+    if(freeLabel){
+      var row2 = freeLabel.closest('.row') || freeLabel.parentElement;
+      if(row2){
+        freeText = row2.textContent || '';
+      }
+    } else {
+      // fallback to whole page text
+      freeText = document.body.innerText;
+    }
+
+    var freeAllowed = !(/بدون\s*أكل\s*حر|No\s*free\s*-?\s*feeding/i.test(freeText));
+    var freeGrams = NaN;
+    if(freeAllowed){
+      // try to extract grams value (e.g., 3.99 غ)
+      var gm = freeText.match(/(\d+[\.,]?\d*)\s*غ/);
+      if(gm){ freeGrams = num(gm[0]); }
+    }
+
+    // Compute calories per meal if possible
+    var mealCal = (isFinite(daily) && isFinite(meals) && meals>0) ? (daily / meals) : NaN;
+
+    // Push to KPI boxes
+    var put = function(id, val){ var el = document.getElementById(id); if(el){ el.textContent = val; } };
+
+    put('resCalories', isFinite(daily) ? (daily.toFixed(2) + ' kcal') : '—');
+    put('resMeals', isFinite(meals) ? String(meals) : '—');
+    put('resMealCal', isFinite(mealCal) ? mealCal.toFixed(2) : '—');
+    put('resFree', freeAllowed ? (isFinite(freeGrams) ? (freeGrams.toFixed(2) + ' غ') : '—') : '🚫');
+  }
+
+  document.addEventListener('DOMContentLoaded', updateKPIs);
+  // Also update after any click on "احسب النتائج" button, if present
+  var calcBtn = Array.from(document.querySelectorAll('button, input[type="button"], .btn'))
+    .find(function(b){ return /احسب النتائج|Calculate/i.test(b.textContent || b.value || ''); });
+  if(calcBtn){ calcBtn.addEventListener('click', function(){ setTimeout(updateKPIs, 30); }); }
+
+  // Observe changes under results card to refresh KPIs
+  var resCard = document.getElementById('resultsCard') || document.body;
+  var mo;
+  try{
+    mo = new MutationObserver(function(){ updateKPIs(); });
+    mo.observe(resCard, {subtree:true, childList:true, characterData:true});
+  }catch(e){}
+})();
+</script>
+
 </body>
 </html>
