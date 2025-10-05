@@ -345,6 +345,28 @@ button:not(.secondary){background:linear-gradient(135deg,var(--accent),var(--acc
   max-width: 900px;    /* allow a bit more width */
 }
 
+
+/* === v24: disclaimer at bottom + tighter font + balanced CTA spacing === */
+
+/* Make main a flex column (safety) so disclaimer can push to bottom */
+main{display:flex;flex-direction:column}
+
+/* Disclaimer: smaller font and anchored just above copyright */
+#disclaimer{
+  font-size:10px !important;   /* one step smaller */
+  margin-top:auto !important;  /* push to the very bottom of main */
+  padding-inline:8px;          /* keep slimmer sides */
+  max-width:920px;
+}
+
+/* Perfectly symmetric space around action buttons inside cards */
+.card .cta{
+  margin-top:24px !important;
+  margin-bottom:24px !important;
+  justify-content:center;
+  gap:12px;
+}
+
 </style>
 </head>
 <body>
