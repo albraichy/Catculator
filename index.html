@@ -164,7 +164,7 @@ const I18N = {
     preW:"الوزن قبل الحمل (كجم)", preWph:"مثال: ٣٫٨",
     pregWeek:"أسبوع الحمل", litter:"عدد الصغار", lacWeek:"أسبوع الإرضاع",
     calc:"احسب النتائج", reset:"إعادة ضبط",
-    daily:"السعرات اليومية", meals:"عدد الوجبات", free:"الأكل الحر",
+    daily:"السعرات اليومية", meals:"عدد الوجبات", perMeal:"السعرات لكل وجبة", free:"الأكل الحر",
     freeYes:(g)=>`مع أكل حر — المطلوب تقريباً ${g} غ`, freeNo:"بدون أكل حر",
     errW:"أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).",
     errWeeks:"الأسابيع يجب أن تكون بين ٥ و ١٦.", errMonths:"الأشهر يجب أن تكون بين ٥ و ١٢.",
@@ -186,7 +186,7 @@ const I18N = {
     preW:"Pre‑pregnancy Weight (kg)", preWph:"e.g., 3.8",
     pregWeek:"Pregnancy Week", litter:"Kitten Count", lacWeek:"Lactation Week",
     calc:"Calculate", reset:"Reset",
-    daily:"Daily Calories", meals:"Meals per Day", free:"Free‑feeding",
+    daily:"Daily Calories", meals:"Meals per Day", perMeal:"kcal per Meal", free:"Free‑feeding",
     freeYes:(g)=>`Allowed — dry food ≈ ${g} g`, freeNo:"Not allowed",
     errW:"Enter a valid weight (> 0).",
     errWeeks:"Weeks must be between 5 and 16.", errMonths:"Months must be between 5 and 12.",
@@ -299,7 +299,7 @@ function rebuildUITexts(){
   lblPreW.textContent=i.preW; prePregW.placeholder=i.preWph; lblPregWeek.textContent=i.pregWeek;
   lblLitter.textContent=i.litter; lblLacWeek.textContent=i.lacWeek;
   calcBtn.textContent=i.calc; resetBtn.textContent=i.reset;
-  r1k.textContent=i.daily; r2k.textContent=i.meals; r3k.textContent=i.free; copyright.textContent=i.copyright;
+  r1k.textContent=i.daily; r2k.textContent=i.meals; r4k.textContent=i.perMeal; r3k.textContent=i.free; copyright.textContent=i.copyright;
 
   // Preserve current selections
   const currentSex = sex.value;
