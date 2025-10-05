@@ -329,6 +329,22 @@ button:not(.secondary){background:linear-gradient(135deg,var(--accent),var(--acc
 /* Balanced CTA spacing above/below and center alignment */
 .card .cta{margin-top:18px; margin-bottom:18px; justify-content:center; gap:12px}
 
+
+/* === Final spacing polish (v23) === */
+/* Make CTA block perfectly balanced vertically inside cards */
+.card .cta{
+  margin-block:20px;   /* equal top & bottom */
+  justify-content:center;
+  gap:12px;
+}
+
+/* Reduce side padding of disclaimer to avoid narrow wrapping, and push it further down above copyright */
+#disclaimer{
+  padding-inline:8px;  /* was 16px */
+  margin-top:28px;     /* sink it closer to footer */
+  max-width: 900px;    /* allow a bit more width */
+}
+
 </style>
 </head>
 <body>
