@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cat Calorie Calculator</title>
 <style>
 :root{
@@ -54,103 +53,107 @@ button.secondary{background:#0b1324;color:var(--text);border:1px solid #22304f}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0c7;text-align:center;font-size:13px}
 .small{font-size:12px}
 
-/* hotfix results grid */
-.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}
-.res-box{border:1px dashed var(--line);border-radius:16px;padding:18px;text-align:center}
-.res-box .label{font-size:14px;opacity:.9;margin-bottom:8px}
-.res-box .value{font-size:20px;font-weight:700;line-height:1.2}
-@media (max-width:380px){
-  .res-box .label{font-size:13px}
-  .res-box .value{font-size:18px}
+/* compact results grid */
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mini{border:1px dashed var(--line);border-radius:16px;padding:18px 14px;text-align:center}
+.mini-label{font-weight:700;margin-bottom:8px}
+.mini-value{font-size:18px}
+@media (min-width:700px){
+  .mini-value{font-size:20px}
 }
+
+/* ↓↓↓ تصغير حجم الخط في قسم النتائج درجتين ↓↓↓ */
+#resultsCard .mini-label { font-size: 14px !important; }
+#resultsCard .mini-value { font-size: 12px !important; }
+
 </style>
 </head>
 <body>
 <header>
-<div class="nav">
-<div class="brand">
-<div aria-hidden="true" class="logo"></div>
-<h1 class="title" id="appTitle">حاسبة سعرات القط</h1>
-</div>
-<div aria-label="Language" class="lang" role="tablist">
-<button aria-selected="true" class="active" id="btnAR">ع</button>
-<button aria-selected="false" id="btnEN">E</button>
-</div>
-</div>
+  <div class="nav">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <h1 class="title" id="appTitle">حاسبة سعرات القط</h1>
+    </div>
+    <div class="lang" role="tablist" aria-label="Language">
+      <button id="btnAR" class="active" aria-selected="true">ع</button>
+      <button id="btnEN" aria-selected="false">E</button>
+    </div>
+  </div>
 </header>
+
 <main>
-<section class="card" id="gateCard">
-<h2 class="section-title" id="secGateTitle">اختر الجنس للمتابعة</h2>
-<label id="lblSexGate">جنس القطة</label>
-<select id="sex"></select>
-</section>
-<div class="grid hide" id="calcGrid">
-<section class="card">
+  <section class="card" id="gateCard">
+    <h2 class="section-title" id="secGateTitle">اختر الجنس للمتابعة</h2>
+    <label id="lblSexGate">جنس القطة</label>
+    <select id="sex"></select>
+  </section>
+
+  <div class="grid hide" id="calcGrid">
+    <section class="card">
 <h2 class="section-title" id="secInputs" style="display: none;"></h2>
-<label id="lblW">الوزن الحالي (كجم)</label>
-<input id="wcur" inputmode="decimal" placeholder="مثال: ٠٫٩" type="text"/>
-<label id="lblBase" style="margin-top:12px">الفئة العمرية/الحالة الأساسية</label>
-<div class="row">
-<select id="baseCategory"></select>
-<div id="baseNumberWrap"><select id="baseNumber"></select></div>
-<div class="hide" id="adultActivityWrap"><select id="adultActivity"></select></div>
-</div>
-<div class="toggles hide" id="reproToggles">
-<label class="toggle" id="pregToggle"><input id="isPreg" type="checkbox"/> <span id="txtPreg">حامل</span></label>
-<label class="toggle" id="lacToggle"><input id="isLac" type="checkbox"/> <span id="txtLac">مرضعة</span></label>
-</div>
-<div class="row hide" id="pregBlock" style="margin-top:6px">
-<div>
-<label id="lblPreW">الوزن قبل الحمل (كجم)</label>
-<input id="prePregW" inputmode="decimal" placeholder="مثال: ٣٫٨" type="text"/>
-</div>
-<div>
-<label id="lblPregWeek">أسبوع الحمل</label>
-<select id="pregWeek"></select>
-</div>
-</div>
-<div class="row hide" id="lacBlock" style="margin-top:6px">
-<div>
-<label id="lblLitter">عدد الصغار</label>
-<select id="litter"></select>
-</div>
-<div>
-<label id="lblLacWeek">أسبوع الإرضاع</label>
-<select id="lacWeek"></select>
-</div>
-</div>
-<div class="error" id="errorAll"></div>
-<div class="cta">
-<button id="calcBtn">احسب النتائج</button>
-<button class="secondary" id="resetBtn">إعادة ضبط</button>
-</div>
+
+      <label id="lblW">الوزن الحالي (كجم)</label>
+      <input id="wcur" type="text" inputmode="decimal" placeholder="مثال: ٠٫٩">
+
+      <label id="lblBase" style="margin-top:12px">الفئة العمرية/الحالة الأساسية</label>
+      <div class="row">
+        <select id="baseCategory"></select>
+        <div id="baseNumberWrap"><select id="baseNumber"></select></div>
+        <div id="adultActivityWrap" class="hide"><select id="adultActivity"></select></div>
+      </div>
+
+      <div id="reproToggles" class="toggles hide">
+        <label class="toggle" id="pregToggle"><input id="isPreg" type="checkbox"> <span id="txtPreg">حامل</span></label>
+        <label class="toggle" id="lacToggle"><input id="isLac" type="checkbox"> <span id="txtLac">مرضعة</span></label>
+      </div>
+
+      <div id="pregBlock" class="row hide" style="margin-top:6px">
+        <div>
+          <label id="lblPreW">الوزن قبل الحمل (كجم)</label>
+          <input id="prePregW" type="text" inputmode="decimal" placeholder="مثال: ٣٫٨">
+        </div>
+        <div>
+          <label id="lblPregWeek">أسبوع الحمل</label>
+          <select id="pregWeek"></select>
+        </div>
+      </div>
+
+      <div id="lacBlock" class="row hide" style="margin-top:6px">
+        <div>
+          <label id="lblLitter">عدد الصغار</label>
+          <select id="litter"></select>
+        </div>
+        <div>
+          <label id="lblLacWeek">أسبوع الإرضاع</label>
+          <select id="lacWeek"></select>
+        </div>
+      </div>
+
+      <div class="error" id="errorAll"></div>
+      <div class="cta">
+        <button id="calcBtn">احسب النتائج</button>
+        <button class="secondary" id="resetBtn">إعادة ضبط</button>
+      </div>
+    </section>
+
+   
+<section class="card hide" id="resultsCard">
+  <h2 class="section-title" id="secResults">النتائج</h2>
+  <div class="result-grid" id="resultGrid">
+    <div class="mini"><div class="mini-label" id="r1k">السعرات اليومية</div><div class="mini-value" id="r1v">0 kcal</div></div>
+    <div class="mini"><div class="mini-label" id="r2k">عدد الوجبات</div><div class="mini-value" id="r2v">0</div></div>
+    <div class="mini"><div class="mini-label" id="r4k">السعرات في كل وجبة</div><div class="mini-value" id="r4v">0</div></div>
+    <div class="mini"><div class="mini-label" id="r3k">الأكل الحر</div><div class="mini-value" id="r3v">—</div></div>
+  </div>
+  <div class="small" id="note" class="hide"></div>
 </section>
 
-<section class="card" id="resultsCard">
-<h2 class="section-title" id="secResults">النتائج</h2>
-<div class="results-grid" id="resultsGrid">
-<div class="res-box">
-<div class="label" data-i18n="dailyCaloriesLabel">السعرات اليومية</div>
-<div class="value" id="daily">—</div>
-</div>
-<div class="res-box">
-<div class="label" data-i18n="mealsLabel">عدد الوجبات</div>
-<div class="value" id="meals">—</div>
-</div>
-<div class="res-box">
-<div class="label" data-i18n="perMealLabel">السعرات لكل وجبة</div>
-<div class="value" id="perMeal">—</div>
-</div>
-<div class="res-box">
-<div class="label" data-i18n="freeLabel">الأكل الحر</div>
-<div class="value" id="free">—</div>
-</div>
-</div>
-</section>
+  </div>
 
-</div>
-<footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
+  <footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
 </main>
+
 <script>
 /* ---------- I18N + helpers ---------- */
 const I18N = {
@@ -166,7 +169,7 @@ const I18N = {
     preW:"الوزن قبل الحمل (كجم)", preWph:"مثال: ٣٫٨",
     pregWeek:"أسبوع الحمل", litter:"عدد الصغار", lacWeek:"أسبوع الإرضاع",
     calc:"احسب النتائج", reset:"إعادة ضبط",
-    daily:"السعرات اليومية", meals:"عدد الوجبات", free:"الأكل الحر",
+    daily:"السعرات اليومية", meals:"عدد الوجبات", perMeal:"السعرات لكل وجبة", free:"الأكل الحر",
     freeYes:(g)=>`مع أكل حر — المطلوب تقريباً ${g} غ`, freeNo:"بدون أكل حر",
     errW:"أدخل الوزن الحالي بشكل صحيح (أكبر من صفر).",
     errWeeks:"الأسابيع يجب أن تكون بين ٥ و ١٦.", errMonths:"الأشهر يجب أن تكون بين ٥ و ١٢.",
@@ -188,7 +191,7 @@ const I18N = {
     preW:"Pre‑pregnancy Weight (kg)", preWph:"e.g., 3.8",
     pregWeek:"Pregnancy Week", litter:"Kitten Count", lacWeek:"Lactation Week",
     calc:"Calculate", reset:"Reset",
-    daily:"Daily Calories", meals:"Meals per Day", free:"Free‑feeding",
+    daily:"Daily Calories", meals:"Meals per Day", perMeal:"kcal per Meal", free:"Free‑feeding",
     freeYes:(g)=>`Allowed — dry food ≈ ${g} g`, freeNo:"Not allowed",
     errW:"Enter a valid weight (> 0).",
     errWeeks:"Weeks must be between 5 and 16.", errMonths:"Months must be between 5 and 12.",
@@ -301,7 +304,7 @@ function rebuildUITexts(){
   lblPreW.textContent=i.preW; prePregW.placeholder=i.preWph; lblPregWeek.textContent=i.pregWeek;
   lblLitter.textContent=i.litter; lblLacWeek.textContent=i.lacWeek;
   calcBtn.textContent=i.calc; resetBtn.textContent=i.reset;
-  r1k.textContent=i.daily; r2k.textContent=i.meals; r3k.textContent=i.free; copyright.textContent=i.copyright;
+  r1k.textContent=i.daily; r2k.textContent=i.meals; r4k.textContent=i.perMeal; r3k.textContent=i.free; copyright.textContent=i.copyright;
 
   // Preserve current selections
   const currentSex = sex.value;
@@ -399,18 +402,19 @@ function calc(){
     if(n < 1) n = 1;
     const deltaC = Math.max(0, calories - n*perMeal);
     const dry = Math.max(0, deltaC/4);
-    freeText = I18N[LANG].freeYes(dry.toFixed(2));
+    freeText = dry.toFixed(2) + ' غ';
     meals = n;
   }else{
     // IMPORTANT FIX: when free‑feeding is NOT allowed, use CEIL for number of meals
     let n = Math.ceil(calories / perMeal);
     if(n < 1) n = 1;
     meals = n;
-    freeText = i.freeNo;
+    freeText = '🚫';
   }
 
   r1v.textContent = calories.toFixed(2) + ' kcal';
   r2v.textContent = String(meals);
+  r4v.textContent = perMeal.toFixed(2) + ' kcal';
   r3v.textContent = freeText;
   resultsCard.classList.remove('hide');
 }
@@ -443,22 +447,5 @@ function init(){
 }
 init();
 </script>
-<script>
-(function(){
-  const daily=document.getElementById('daily');
-  const meals=document.getElementById('meals');
-  const per=document.getElementById('perMeal');
-  if(!daily||!meals||!per) return;
-  const recalc=()=>{
-    const c=parseFloat(String(daily.textContent).replace(/[^\d.]/g,''))||0;
-    const m=parseFloat(String(meals.textContent).replace(/[^\d.]/g,''))||0;
-    if(c>0 && m>0){ per.textContent=(c/m).toFixed(2)+' kcal'; }
-    else { per.textContent='—'; }
-  };
-  const obsCfg={characterData:true,childList:true,subtree:true};
-  new MutationObserver(recalc).observe(daily,obsCfg);
-  new MutationObserver(recalc).observe(meals,obsCfg);
-  recalc();
-})();
-</script></body>
+</body>
 </html>
