@@ -309,6 +309,18 @@ button:not(.secondary){background:linear-gradient(135deg,var(--accent),var(--acc
 /* Extra comfortable gap between the 'sex' card and the inputs card */
 #gateCard{margin-bottom:22px}
 
+
+/* === Disclaimer style === */
+#disclaimer{
+  font-size:12px;
+  color:var(--muted);
+  text-align:center;
+  padding:12px 18px calc(12px + env(safe-area-inset-bottom));
+  line-height:1.6;
+  max-width:850px;
+  margin:0 auto;
+}
+
 </style>
 </head>
 <body>
@@ -395,6 +407,11 @@ button:not(.secondary){background:linear-gradient(135deg,var(--accent),var(--acc
   </div>
 
   <footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
+
+<div id="disclaimer">
+⚠️ تنويه: تم تصميم وتطوير المعادلة المستخدمة في هذه الحاسبة بشكل خاص من قِبل مطوّر الموقع، بعد دراسة وتحليل عدد من المصادر والدراسات الطبية البيطرية الحديثة، دون الاعتماد على المعادلات العامة أو الأساليب الشائعة. تهدف القيم الناتجة إلى تقديم أدق التقديرات التقريبية للمساعدة فقط، ولا تُعد بديلاً عن استشارة الطبيب البيطري المختص.
+</div>
+
 </main>
 
 <script>
