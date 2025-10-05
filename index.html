@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+
+<html dir="rtl" lang="ar">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Cat Calorie Calculator</title>
 <style>
 :root{
@@ -53,93 +54,103 @@ button.secondary{background:#0b1324;color:var(--text);border:1px solid #22304f}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:16px;color:#9fb0c7;text-align:center;font-size:13px}
 .small{font-size:12px}
 
-/* === tweak: smaller results typography (2 steps down) === */
-#resultsCard .mini-label{font-size:14px !important; white-space:nowrap;}
-#resultsCard .mini-value{font-size:12px !important;}
-
+/* hotfix results grid */
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}
+.res-box{border:1px dashed var(--line);border-radius:16px;padding:18px;text-align:center}
+.res-box .label{font-size:14px;opacity:.9;margin-bottom:8px}
+.res-box .value{font-size:20px;font-weight:700;line-height:1.2}
+@media (max-width:380px){
+  .res-box .label{font-size:13px}
+  .res-box .value{font-size:18px}
+}
 </style>
 </head>
 <body>
 <header>
-  <div class="nav">
-    <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <h1 class="title" id="appTitle">حاسبة سعرات القط</h1>
-    </div>
-    <div class="lang" role="tablist" aria-label="Language">
-      <button id="btnAR" class="active" aria-selected="true">ع</button>
-      <button id="btnEN" aria-selected="false">E</button>
-    </div>
-  </div>
+<div class="nav">
+<div class="brand">
+<div aria-hidden="true" class="logo"></div>
+<h1 class="title" id="appTitle">حاسبة سعرات القط</h1>
+</div>
+<div aria-label="Language" class="lang" role="tablist">
+<button aria-selected="true" class="active" id="btnAR">ع</button>
+<button aria-selected="false" id="btnEN">E</button>
+</div>
+</div>
 </header>
-
 <main>
-  <section class="card" id="gateCard">
-    <h2 class="section-title" id="secGateTitle">اختر الجنس للمتابعة</h2>
-    <label id="lblSexGate">جنس القطة</label>
-    <select id="sex"></select>
-  </section>
-
-  <div class="grid hide" id="calcGrid">
-    <section class="card">
+<section class="card" id="gateCard">
+<h2 class="section-title" id="secGateTitle">اختر الجنس للمتابعة</h2>
+<label id="lblSexGate">جنس القطة</label>
+<select id="sex"></select>
+</section>
+<div class="grid hide" id="calcGrid">
+<section class="card">
 <h2 class="section-title" id="secInputs" style="display: none;"></h2>
+<label id="lblW">الوزن الحالي (كجم)</label>
+<input id="wcur" inputmode="decimal" placeholder="مثال: ٠٫٩" type="text"/>
+<label id="lblBase" style="margin-top:12px">الفئة العمرية/الحالة الأساسية</label>
+<div class="row">
+<select id="baseCategory"></select>
+<div id="baseNumberWrap"><select id="baseNumber"></select></div>
+<div class="hide" id="adultActivityWrap"><select id="adultActivity"></select></div>
+</div>
+<div class="toggles hide" id="reproToggles">
+<label class="toggle" id="pregToggle"><input id="isPreg" type="checkbox"/> <span id="txtPreg">حامل</span></label>
+<label class="toggle" id="lacToggle"><input id="isLac" type="checkbox"/> <span id="txtLac">مرضعة</span></label>
+</div>
+<div class="row hide" id="pregBlock" style="margin-top:6px">
+<div>
+<label id="lblPreW">الوزن قبل الحمل (كجم)</label>
+<input id="prePregW" inputmode="decimal" placeholder="مثال: ٣٫٨" type="text"/>
+</div>
+<div>
+<label id="lblPregWeek">أسبوع الحمل</label>
+<select id="pregWeek"></select>
+</div>
+</div>
+<div class="row hide" id="lacBlock" style="margin-top:6px">
+<div>
+<label id="lblLitter">عدد الصغار</label>
+<select id="litter"></select>
+</div>
+<div>
+<label id="lblLacWeek">أسبوع الإرضاع</label>
+<select id="lacWeek"></select>
+</div>
+</div>
+<div class="error" id="errorAll"></div>
+<div class="cta">
+<button id="calcBtn">احسب النتائج</button>
+<button class="secondary" id="resetBtn">إعادة ضبط</button>
+</div>
+</section>
 
-      <label id="lblW">الوزن الحالي (كجم)</label>
-      <input id="wcur" type="text" inputmode="decimal" placeholder="مثال: ٠٫٩">
+<section class="card" id="resultsCard">
+<h2 class="section-title" id="secResults">النتائج</h2>
+<div class="results-grid" id="resultsGrid">
+<div class="res-box">
+<div class="label" data-i18n="dailyCaloriesLabel">السعرات اليومية</div>
+<div class="value" id="daily">—</div>
+</div>
+<div class="res-box">
+<div class="label" data-i18n="mealsLabel">عدد الوجبات</div>
+<div class="value" id="meals">—</div>
+</div>
+<div class="res-box">
+<div class="label" data-i18n="perMealLabel">السعرات لكل وجبة</div>
+<div class="value" id="perMeal">—</div>
+</div>
+<div class="res-box">
+<div class="label" data-i18n="freeLabel">الأكل الحر</div>
+<div class="value" id="free">—</div>
+</div>
+</div>
+</section>
 
-      <label id="lblBase" style="margin-top:12px">الفئة العمرية/الحالة الأساسية</label>
-      <div class="row">
-        <select id="baseCategory"></select>
-        <div id="baseNumberWrap"><select id="baseNumber"></select></div>
-        <div id="adultActivityWrap" class="hide"><select id="adultActivity"></select></div>
-      </div>
-
-      <div id="reproToggles" class="toggles hide">
-        <label class="toggle" id="pregToggle"><input id="isPreg" type="checkbox"> <span id="txtPreg">حامل</span></label>
-        <label class="toggle" id="lacToggle"><input id="isLac" type="checkbox"> <span id="txtLac">مرضعة</span></label>
-      </div>
-
-      <div id="pregBlock" class="row hide" style="margin-top:6px">
-        <div>
-          <label id="lblPreW">الوزن قبل الحمل (كجم)</label>
-          <input id="prePregW" type="text" inputmode="decimal" placeholder="مثال: ٣٫٨">
-        </div>
-        <div>
-          <label id="lblPregWeek">أسبوع الحمل</label>
-          <select id="pregWeek"></select>
-        </div>
-      </div>
-
-      <div id="lacBlock" class="row hide" style="margin-top:6px">
-        <div>
-          <label id="lblLitter">عدد الصغار</label>
-          <select id="litter"></select>
-        </div>
-        <div>
-          <label id="lblLacWeek">أسبوع الإرضاع</label>
-          <select id="lacWeek"></select>
-        </div>
-      </div>
-
-      <div class="error" id="errorAll"></div>
-      <div class="cta">
-        <button id="calcBtn">احسب النتائج</button>
-        <button class="secondary" id="resetBtn">إعادة ضبط</button>
-      </div>
-    </section>
-
-    <section class="card hide" id="resultsCard">
-      <h2 class="section-title" id="secResults">النتائج</h2>
-      <div class="stat"><div class="k" id="r1k">السعرات اليومية</div><div id="r1v">0 kcal</div></div>
-      <div class="stat"><div class="k" id="r2k">عدد الوجبات</div><div id="r2v">0</div></div>
-      <div class="stat"><div class="k" id="r3k">الأكل الحر</div><div id="r3v">—</div></div>
-      <div class="small" id="note" class="hide"></div>
-    </section>
-  </div>
-
-  <footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
+</div>
+<footer id="copyright">© Albraichy 2025 — جميع الحقوق محفوظة</footer>
 </main>
-
 <script>
 /* ---------- I18N + helpers ---------- */
 const I18N = {
@@ -432,5 +443,22 @@ function init(){
 }
 init();
 </script>
-</body>
+<script>
+(function(){
+  const daily=document.getElementById('daily');
+  const meals=document.getElementById('meals');
+  const per=document.getElementById('perMeal');
+  if(!daily||!meals||!per) return;
+  const recalc=()=>{
+    const c=parseFloat(String(daily.textContent).replace(/[^\d.]/g,''))||0;
+    const m=parseFloat(String(meals.textContent).replace(/[^\d.]/g,''))||0;
+    if(c>0 && m>0){ per.textContent=(c/m).toFixed(2)+' kcal'; }
+    else { per.textContent='—'; }
+  };
+  const obsCfg={characterData:true,childList:true,subtree:true};
+  new MutationObserver(recalc).observe(daily,obsCfg);
+  new MutationObserver(recalc).observe(meals,obsCfg);
+  recalc();
+})();
+</script></body>
 </html>
