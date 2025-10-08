@@ -463,7 +463,7 @@ main{display:flex;flex-direction:column}
     <div class="mini"><div class="mini-label" id="r4k">السعرات في كل وجبة</div><div class="mini-value" id="r4v">0</div></div>
     <div class="mini"><div class="mini-label" id="r3k">الأكل الحر</div><div class="mini-value" id="r3v">—</div></div>
   </div>
-  <div class="small" id="note" class="hide"></div>
+  <div class="small hide" id="note"></div>
 </section>
 
   </div>
@@ -667,7 +667,7 @@ function setLang(lang){
   document.getElementById('btnAR').classList.toggle('active', LANG==='ar');
   document.getElementById('btnEN').classList.toggle('active', LANG==='en');
   rebuildUITexts();
-  updateDisclaimer(); updateDisclaimer(); // Always hide results when language toggles to avoid stale mixed text
+  updateDisclaimer(); // Always hide results when language toggles to avoid stale mixed text
   resultsCard.classList.add('hide');
 }
 function onSexChange(){
@@ -727,6 +727,7 @@ function calc(){
   const calories = 100 * Math.pow(w,0.67) * A * P * weightAdj * L;
 
   const perMeal = 40*w;
+  let mealSizeKcal = perMeal; // default = 40W; override to C/N when free-feeding is off
   let meals, freeText=i.freeNo;
   if(freeAllowed){
     let n = Math.floor(calories / perMeal) - 1;
@@ -735,17 +736,19 @@ function calc(){
     const dry = Math.max(0, deltaC/4);
     freeText = (LANG==='en' ? (dry.toFixed(2) + ' g') : (dry.toFixed(2) + ' غ'));
     meals = n;
+    mealSizeKcal = perMeal;
   }else{
     // IMPORTANT FIX: when free‑feeding is NOT allowed, use CEIL for number of meals
     let n = Math.ceil(calories / perMeal);
     if(n < 1) n = 1;
     meals = n;
+    mealSizeKcal = calories / n; // show C/N when free-feeding is not allowed
     freeText = '🚫';
   }
 
   r1v.textContent = calories.toFixed(2) + ' kcal';
   r2v.textContent = String(meals);
-  r4v.textContent = perMeal.toFixed(2) + ' kcal';
+  r4v.textContent = mealSizeKcal.toFixed(2) + ' kcal';
   r3v.textContent = freeText;
   
 try{
@@ -798,7 +801,7 @@ function init(){
   calcGrid.classList.add('hide');
   resultsCard.classList.add('hide'); // ensure hidden at start
   rebuildUITexts();
-updateDisclaimer(); updateDisclaimer(); updateDisclaimer(); updateDisclaimer(); }
+updateDisclaimer(); }
 init();
 
 // Ensure disclaimer follows current language
